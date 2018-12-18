@@ -84,11 +84,12 @@ void Cell::Draw()
     }
     else
     {
-        m_pPainter->setPen(*(m_pPan->m_pSolidPen[COLOR_CELLBK]));
+        m_pPainter->setPen(*(m_pPan->m_pSolidPen[COLOR_DISUSE]));
         m_pPainter->drawEllipse(m_rRect);//画未展开圆
+        DrawUnexpanded();
     }
     //写单元数
-    m_pPainter->setPen(*(m_pPan->m_pSolidPen[COLOR_CELL]));
+    m_pPainter->setPen(*(m_pPan->m_pSolidPen[COLOR_NUM]));
     QFont font;
     font.setPointSize(10);
     m_pPainter->setFont(font);
@@ -98,7 +99,7 @@ void Cell::Draw()
 void Cell::DrawArc()
 {
     //画最后的落点所在的圆
-    m_pPainter->setPen(*(m_pPan->m_pSolidPen[COLOR_CELLBK]));
+    m_pPainter->setPen(*(m_pPan->m_pSolidPen[COLOR_CIRCLE]));
     m_pPainter->drawArc(m_rRect,0,360*SPLIT_DEGREE);
     //画运行的轨迹
     m_pPainter->setPen(*(m_pPan->m_pSolidPen[COLOR_RUN]));
@@ -114,6 +115,18 @@ void Cell::DrawCenEcc()
 
     //中心轴外形    偏心轴外形
     m_pPainter->setPen(*(m_pPan->m_pSolidPen[COLOR_SHAFT]));
+    m_pPainter->drawPath(m_pathCen);
+    m_pPainter->drawPath(m_pathEcc);
+}
+
+void Cell::DrawUnexpanded()
+{
+    //展开痕迹
+    m_pPainter->setPen(*(m_pPan->m_pDddPen[COLOR_DISUSE]));
+    m_pPainter->drawLine(m_pPan->Op2Vp(m_dCenterX,m_dCenterY),m_pPan->Op2Vp(m_ptEccR2));
+    m_pPainter->drawLine(m_pPan->Op2Vp(m_ptEccR2),m_pPan->Op2Vp(m_ptEccR1));
+    //中心轴外形    偏心轴外形
+    m_pPainter->setPen(*(m_pPan->m_pSolidPen[COLOR_DISUSE]));
     m_pPainter->drawPath(m_pathCen);
     m_pPainter->drawPath(m_pathEcc);
 }

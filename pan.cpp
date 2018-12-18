@@ -99,15 +99,15 @@ QColor Pan::GetDefinedColor(int n)
     QColor col;
     switch (n)
     {
-    case COLOR_CELL:	col = QColor(255, 255, 255);	break;//白色
-    case COLOR_BREAK:	col = QColor(255, 0, 0);		break;//红色
-    case COLOR_RUN:	    col = QColor(0, 225, 0);	    break;//绿色
-    case COLOR_COORD:	col = QColor(180, 255, 105);    break;//浅蓝色
-    case COLOR_TEXT:	col = QColor(65, 70, 80);		break;//浅灰色
-    case COLOR_CELLBK:	col = QColor(50, 50, 50);       break;//浅灰色
-    case COLOR_TARGET:	col = QColor(245, 255, 110);	break;//浅黄色
-    case COLOR_BORDER:	col = QColor(0, 0, 255);    	break;//边界蓝色
-    case COLOR_SHAFT:   col = QColor(235,170,255);      break;//浅紫色
+    case COLOR_NUM:	    col = QColor(255, 255, 255);	break;//白色单元号颜色
+    case COLOR_BREAK:	col = QColor(255, 0, 0);		break;//红色单元碰撞区域颜色
+    case COLOR_RUN:	    col = QColor(0, 225, 0);	    break;//绿色单元运行过的路径颜色
+    case COLOR_COORD:	col = QColor(180, 0, 0);        break;//浅红色坐标轴颜色
+    case COLOR_DISUSE:	col = QColor(50, 50, 50);	    break;//浅灰色不展开单元轴外形
+    case COLOR_CIRCLE:	col = QColor(80, 80, 80);       break;//浅灰色单元展开最外圆
+    case COLOR_TARGET:	col = QColor(245, 255, 110);	break;//浅黄色目标点
+    case COLOR_BORDER:	col = QColor(0, 0, 255);    	break;//蓝色边界
+    case COLOR_SHAFT:   col = QColor(235,170,255);      break;//浅紫色运行轴外形
 
     default:			col = QColor(192, 192, 192);
     }
@@ -117,7 +117,7 @@ QColor Pan::GetDefinedColor(int n)
 void Pan::InitDrawTools()
 {
     QColor col;
-    for (int i = 0; i < COLOR_NUM; i++)
+    for (int i = 0; i < COLOR_AMOUNT; i++)
     {
         col = GetDefinedColor(i);
         m_cColor[i] = col;
@@ -130,7 +130,7 @@ void Pan::InitDrawTools()
 
 void Pan::CloseDrawTools()
 {
-    for (int i = 0; i < COLOR_NUM; i++)
+    for (int i = 0; i < COLOR_AMOUNT; i++)
     {
         delete m_pSolidPen[i];
         delete m_pDashPen[i];
@@ -235,15 +235,21 @@ QRect Pan::Radius2Rect(const double dx, const double dy, const double dR)
 
 void Pan::Draw()
 {
-    if(!m_bRunStatus)
+//    if(!m_bRunStatus)
+//    {
+//        for (int i = 0; i < m_nCheckNum;i++)
+//        {
+//            CreateCellPath(m_nCheckID[i]);
+//            m_bRunEnd=false;
+//        }
+//        CheckIntersects();
+//    }
+    for (int i = 1; i <= CELL_NUM;i++)
     {
-        for (int i = 0; i < m_nCheckNum;i++)
-        {
-            CreateCellPath(m_nCheckID[i]);
-            m_bRunEnd=false;
-        }
-        CheckIntersects();
+        CreateCellPath(i);
+        m_bRunEnd=false;
     }
+    CheckIntersects();
     //画单元,运行时已经生成单元轮廓轨迹
     for(int i=0;i<CELL_NUM;i++)
     {

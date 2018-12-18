@@ -69,11 +69,11 @@ public:
     int        m_nSolutionTimerID;  //解决方案定时器ID
     int        m_nDealTimerID;      //测试定时器ID
 public:
-    QColor     m_cColor[COLOR_NUM];
-    QPen*      m_pSolidPen[COLOR_NUM];
-    QPen*      m_pDashPen[COLOR_NUM];
-    QPen*      m_pDddPen[COLOR_NUM];
-    QBrush*    m_bBrush[COLOR_NUM];
+    QColor     m_cColor[COLOR_AMOUNT];
+    QPen*      m_pSolidPen[COLOR_AMOUNT];
+    QPen*      m_pDashPen[COLOR_AMOUNT];
+    QPen*      m_pDddPen[COLOR_AMOUNT];
+    QBrush*    m_bBrush[COLOR_AMOUNT];
 public:
     void    InitPan();               //初始化Pan
     void    InitCheckCell();         //初始化Cell

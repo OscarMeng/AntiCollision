@@ -75,6 +75,7 @@ public:
     void   Draw();
     void   DrawArc();//运行半径小于中心轴m_dCen+偏心轴m_dEcc，运行要到达的角度从x正轴开始，小于等于2*PI
     void   DrawCenEcc();//画中心轴和偏心轴
+    void   DrawUnexpanded();//画未展开的中心轴和偏心轴
     void   DrawTargetPos();//画目标点
     double LengthByPoint(const QPointF pointF);
     void   CalCurrentCenEccDegree();
