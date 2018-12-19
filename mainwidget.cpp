@@ -102,9 +102,9 @@ void MainWidget::SetUnitPos()
             output<<str<<endl;
             for(int i=0;i<59;i++)
             {
-                double dR=double(85+rand()%85)/10;
-                int    nA=rand()%360;
-                str.sprintf("%-8d%-15f%-10d",nCell[i],dR,nA);
+                double dR=double(850+rand()%850)/100;    //展开半径8.5~17mm之间
+                double dA=double(rand()%36000)/100;      //运行到的度数0~360°
+                str.sprintf("%-8d%-15f%-10d",nCell[i],dR,dA);
                 output<<str<<endl;
             }
         }

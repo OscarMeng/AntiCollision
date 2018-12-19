@@ -127,30 +127,30 @@ void ControlWidget::SetProgressBar()
     int nEccDegree=0;
     int nC=0;
     int nE=0;
-    for(int i=0;i<m_pPan->m_nCheckNum;i++)
+    for(int i=0;i<m_pPan->m_nRunNum;i++)
     {
-        if(nCenDegree<m_pPan->CenTargetDegree(m_pPan->m_nCheckID[i]))
+        if(nCenDegree<m_pPan->CenTargetSlice(m_pPan->m_nRunID[i]))
         {
-            nCenDegree=m_pPan->CenTargetDegree(m_pPan->m_nCheckID[i]);
+            nCenDegree=m_pPan->CenTargetSlice(m_pPan->m_nRunID[i]);
             nC=i;
         }
-        if(nEccDegree<m_pPan->EccTargetDegree(m_pPan->m_nCheckID[i]))
+        if(nEccDegree<m_pPan->EccTargetSlice(m_pPan->m_nRunID[i]))
         {
-            nEccDegree=m_pPan->EccTargetDegree(m_pPan->m_nCheckID[i]);
+            nEccDegree=m_pPan->EccTargetSlice(m_pPan->m_nRunID[i]);
             nE=i;
         }
     }
     int nDegree;
-    if(nCenDegree>=nEccDegree)
-    {
-        nDegree=m_pPan->CalCenDegree(m_pPan->m_nCheckID[nC]);
-        m_pProgressBar->setValue(double(nDegree)/nCenDegree*999);
-    }
-    else
-    {
-        nDegree=m_pPan->CalEccDegree(m_pPan->m_nCheckID[nE]);
-        m_pProgressBar->setValue(double(nDegree)/nEccDegree*999);
-    }
+//    if(nCenDegree>=nEccDegree)
+//    {
+//        nDegree=m_pPan->CalCenSlice(m_pPan->m_nRunID[nC]);
+//        m_pProgressBar->setValue(double(nDegree)/nCenDegree*999);
+//    }
+//    else
+//    {
+//        nDegree=m_pPan->CalEccSlice(m_pPan->m_nRunID[nE]);
+//        m_pProgressBar->setValue(double(nDegree)/nEccDegree*999);
+//    }
 }
 
 

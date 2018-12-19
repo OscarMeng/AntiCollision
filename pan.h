@@ -40,23 +40,24 @@ public:
 
 public:
     const double	    m_dRPan = 230;   			//焦面板半径
-    const double	    m_dRCenter = 28;		    //焦面板中心孔半径
+    const double	    m_dRPanCenter = 28;		    //焦面板中心孔半径
     const double        m_dMaxZoom = 20;            //最大放大倍数
     const double        m_dMinZoom = 1;             //最小缩小倍数
     int	                m_nCellsX;	                //盘正X轴，根据单元坐标点调整
     int             	m_nCellsY;	                //盘正Y轴，根据单元坐标点调整
-    int                 m_nCheckID[CELL_NUM];       //选择运行的单元号
-    double              m_dCheckRadius[CELL_NUM];   //选择单元的运行半径
-    int                 m_nCheckAngle[CELL_NUM];    //选择单元运行到的角度,相对于x轴正方向
+    int                 m_nRunID[CELL_NUM];         //运行的单元号
+    double              m_dRunRadius[CELL_NUM];     //单元的运行半径
+    double              m_dRunRadian[CELL_NUM];     //单元运行到的弧度,读取文件的度数°转化为弧度rad,相对于x轴正方向
     QPainterPath        m_pathInsertects[CELL_NUM]; //重叠区域
-    int                 m_nCheckNum;                //选择单元的总数量
-    int                 m_nDegreeIndex;             //角展开索引
+
+    int                 m_nRunNum;                  //运行单元的总数量
+    int                 m_nSliceIndex;              //弧度片展开索引
     int                 m_nPathIndex;               //每检测一次重叠区域个数
     int                 m_nPlayIndex;               //运行索引
     bool                m_bRunStatus;               //运行状态
     bool                m_bRunEnd;                  //运行完成
     bool                m_bPauseStatus;             //暂停状态
-    bool                m_bTargetDegree;            //目标角度
+    bool                m_bTargetSlice;             //目标弧度片
     QString             m_sFilePath;                //读取文件路径
     int                 m_nPosIndex;                //单元波形位置索引
     int                 m_nCellWavePos;             //单元波形的位置
@@ -86,19 +87,19 @@ public:
     QPoint	Vp2Op(const QPoint& point);               //视图点转换原点
     void    GetCellID(const QPoint& point,int& nID);  //根据点值找到单元号
     void    CellCenEccValue(QPoint &point);
-    QRect   Radius2Rect(const double dx,const double dy,const double dR);//视图点和半径转换rect
+    QRect   Radius2Rect(double dx,double dy,double dR);//视图点和半径转换rect
     void	Draw();						//绘制单元
 
-    int     CenTargetDegree(int nID);            //中心轴到目标跨度的角度
-    int     EccTargetDegree(int nID);            //偏心轴到目标位置的角度
-    int     CalCenDegree(int nID);               //计算单元中心轴已转动过的角度
-    int     CalEccDegree(int nID);               //计算单元偏心轴已转动过的角度
-    void    SetCenPosValue(int nID, int nPos, int nData);//设置单元中心轴某位置的值
-    void    SetEccPosValue(int nID, int nPos, int nData);//设置单元偏心轴某位置的值
+    int     CenTargetSlice(int nID);                       //中心轴到目标跨度的弧度片
+    int     EccTargetSlice(int nID);                      //偏心轴到目标位置的弧度片
+    int     CalCenSlice(int nID, int nPos);               //计算单元中心轴已转动过的弧度片
+    int     CalEccSlice(int nID, int nPos);               //计算单元偏心轴已转动过的弧度片
+    void    SetCenPosValue(int nID, int nPos, int nValue);//设置单元中心轴某位置的值
+    void    SetEccPosValue(int nID, int nPos, int nValue);//设置单元偏心轴某位置的值
     void    SetCellWavePos(int nID,int nPos); //设置单元波形当前位置，单元通过位置计算当前角度值
     void    SetCellRunStatus(int nID,bool bStatus);//设置单元的状态，是运行还是处理
-    void    SetCellCenDegree(int nID,int nDegree);//设置中心轴单元的度数
-    void    SetCellEccDegree(int nID,int nDegree);//设置偏心轴单元的度数
+    void    SetCellCenSlice(int nID,int nSlice);    //设置中心轴单元的度数
+    void    SetCellEccSlice(int nID,int nSlice);    //设置偏心轴单元的度数
     void    SetCellEccRadius(int nID,double dRadius);//设置偏心轴单元半径
     int     CellCenPosValue(int nID,int nPos);//某单元中心轴波形的某位置值
     int     CellEccPosValue(int nID,int nPos);//某单元中心轴波形的某位置值

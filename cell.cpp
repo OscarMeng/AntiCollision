@@ -3,9 +3,9 @@
 Cell::Cell(int nID, int nStatus, double dCenterX, double dCenterY)
 : m_nID(nID), m_nStatus(nStatus), m_dCenterX(dCenterX), m_dCenterY(dCenterY)
 {
-    m_nCurrentCenDegree=0;
-    m_nCurrentEccDegree=0;
-    m_dDrawEccAngle=0;
+    m_nCurrentCenSlice=0;
+    m_nCurrentEccSlice=0;
+    m_dChamferDegree=0;
     m_nWavePos=0;
     m_bRunStatus=true;
     m_dREcc=MAX_RADIUS;
@@ -41,30 +41,45 @@ Cell::~Cell()
 }
 
 //运行的点最终半径和角度
-void Cell::InitCell(Pan *pPan, double dRadius, int nAngle)
+void Cell::InitCell(Pan *pPan, double dRadius, double dRadian)
 {
     m_pPan = pPan;
-    m_nRunAngle = nAngle;
+    m_dRunRadian = dRadian;
     if(dRadius<=0)
     {
         m_dRadius =0;
-        m_dStartAngle=acos(0);
+        m_dStartRadian=acos(0);
     }
     else if(dRadius>=2*m_dRunEcc)
     {
         m_dRadius=2*m_dRunEcc;
-        m_dStartAngle=acos(1);
+        m_dStartRadian=acos(1);
     }
     else
     {
         m_dRadius = dRadius;
-        m_dStartAngle = acos((m_dRadius*m_dRadius + m_dRunEcc*m_dRunEcc - m_dRunEcc*m_dRunEcc)
+        m_dStartRadian = acos((m_dRadius*m_dRadius + m_dRunEcc*m_dRunEcc - m_dRunEcc*m_dRunEcc)
                             /(2 * m_dRadius*m_dRunEcc));//三角形余弦定理
     }
-    m_dEccRunAngle=PI-2*m_dStartAngle;
-    m_nEccRunDegree=int(m_dEccRunAngle/PI*180)*SPLIT_DEGREE;
-    m_nStartDegree=int(m_dStartAngle/PI*180)*SPLIT_DEGREE;
-    m_nRunDegree=m_nRunAngle*SPLIT_DEGREE;
+    if(m_nStatus==RUN_STATUS)
+    {
+        //保证弧度大于0
+        m_dCenRadian=m_dRunRadian-m_dStartRadian;
+        m_nCenRadSlice=qRound(m_dCenRadian*SLICE_RATIO);
+        m_dEccRadian=PI-2*m_dStartRadian;
+        m_nEccRadSlice=qRound(m_dEccRadian*SLICE_RATIO);
+        m_nStartRadSlice=qRound(m_dStartRadian*SLICE_RATIO);
+        m_nRunRadSlice=qRound(m_dRunRadian*SLICE_RATIO);
+        for(int i=0;i<m_nCenRadSlice;i++)
+        {
+            m_nCenWave[i]=BYTE_RUN;
+        }
+        for(int j=0;j<m_nEccRadSlice;j++)
+        {
+            m_nEccWave[j]=BYTE_RUN;
+        }
+    }
+
 }
 
 QRect Cell::CalRect()
@@ -100,7 +115,7 @@ void Cell::DrawArc()
 {
     //画最后的落点所在的圆
     m_pPainter->setPen(*(m_pPan->m_pSolidPen[COLOR_CIRCLE]));
-    m_pPainter->drawArc(m_rRect,0,360*SPLIT_DEGREE);
+    m_pPainter->drawArc(m_rRect,0,360*16);
     //画运行的轨迹
     m_pPainter->setPen(*(m_pPan->m_pSolidPen[COLOR_RUN]));
     m_pPainter->drawPath(m_pathArc);
@@ -135,8 +150,8 @@ void Cell::DrawTargetPos()
 {
     //目标点
     m_pPainter->setPen(*(m_pPan->m_pSolidPen[COLOR_TARGET]));
-    double dDegree=double(m_nRunDegree-m_nStartDegree)/SPLIT_DEGREE/180.0*PI+m_dStartAngle;
-    QPointF p=QPointF(m_dCenterX+m_dRadius*cos(dDegree),m_dCenterY-m_dRadius*sin(dDegree));
+    double dRadian=m_dRunRadian;
+    QPointF p=QPointF(m_dCenterX+m_dRadius*cos(dRadian),m_dCenterY-m_dRadius*sin(dRadian));
     double d=1.0;
     QPointF p1=QPointF(p.x()-d,p.y()-d);
     QPointF p2=QPointF(p.x()+d,p.y()-d);
@@ -151,7 +166,7 @@ double Cell::LengthByPoint(const QPointF pointF)
     return sqrt(pointF.x()*pointF.x()+pointF.y()*pointF.y());
 }
 
-void Cell::CalCurrentCenEccDegree()
+void Cell::CalCurrentRadSlice()
 {
     int nCenDegree=0;
     int nEccDegree=0;
@@ -161,25 +176,25 @@ void Cell::CalCurrentCenEccDegree()
         int m=m_nEccWave[i];
         if(n!=BYTE_NULL)
         {
-            nCenDegree+=n*SPLIT_DEGREE;
+            nCenDegree+=n*SLICE_RATIO;
         }
         if(m!=BYTE_NULL)
         {
-            nEccDegree+=m*SPLIT_DEGREE;
+            nEccDegree+=m*SLICE_RATIO;
         }
     }
-    m_nCurrentCenDegree=nCenDegree;
-    m_nCurrentEccDegree=nEccDegree;
+    m_nCurrentCenSlice=nCenDegree;
+    m_nCurrentEccSlice=nEccDegree;
 }
 
 void Cell::CreatePoint()
 {
     if(!m_bRunStatus)
     {
-        CalCurrentCenEccDegree();
+        CalCurrentRadSlice();
     }
     //中心轴外形矩形4点
-    double dCenCurrent=double(m_nCurrentCenDegree)/SPLIT_DEGREE/180.0*PI;//中心轴转动的角度，也就是从x轴正方向开始转动角度
+    double dCenCurrent=double(m_nCurrentCenSlice)/SLICE_RATIO;//中心轴转动的角度，也就是从x轴正方向开始转动角度
     double dPA1=dCenCurrent+m_dAngleP1;
     double dPA2=dCenCurrent+m_dAngleP2;
     double dPA3=dCenCurrent+m_dAngleP3;
@@ -191,24 +206,25 @@ void Cell::CreatePoint()
 
     //偏心轴外形矩形4点，中心3点
     double dCenDistance=m_dEcc-2*m_dREcc-m_dRunEcc;
-    double dEccCurrent=double(m_nCurrentEccDegree)/SPLIT_DEGREE/180.0*PI;//偏心轴转动的角度，也就是从x轴负方向开始转动角度
+    double dEccCurrent=double(m_nCurrentEccSlice)/SLICE_RATIO;//偏心轴转动的角度，也就是从x轴负方向开始转动角度
     double dRadius=sqrt(m_dRunEcc*m_dRunEcc+m_dRunEcc*m_dRunEcc
                         -2*m_dRunEcc*m_dRunEcc*cos(dEccCurrent));
     double dRadiusAngle=(PI-dEccCurrent)/2.0;
     m_ptEccR1=QPointF(m_dCenterX+dRadius*cos(dRadiusAngle+dCenCurrent),
-                   m_dCenterY-dRadius*sin(dRadiusAngle+dCenCurrent));
+                      m_dCenterY-dRadius*sin(dRadiusAngle+dCenCurrent));
     m_ptEccR2=QPointF(m_dCenterX+m_dRunEcc*cos(dCenCurrent),
-                   m_dCenterY-m_dRunEcc*sin(dCenCurrent));
+                      m_dCenterY-m_dRunEcc*sin(dCenCurrent));
+    double dL=LengthByPoint(QPointF(m_ptEccR1.x()-m_ptEccR2.x(),m_ptEccR1.y()-m_ptEccR2.y()));
 
-    double dCenA=asin(abs(m_ptEccR1.y()-m_ptEccR2.y())/m_dRunEcc);
-    double dAngle=PI/2.0-dCenA;
+    double dCenA=asin(abs(m_ptEccR1.y()-m_ptEccR2.y())/dL);
+    double dAngle=acos(abs(m_ptEccR1.y()-m_ptEccR2.y())/dL);
     double dCX1=m_ptEccR1.x();
     double dCY1=m_ptEccR1.y();
     double dCX2=m_ptEccR2.x();
     double dCY2=m_ptEccR2.y();
     if(dCX1>=dCX2&&dCY1<=dCY2)
     {
-        m_dDrawEccAngle=dCenA/PI*180.0-90.0;
+        m_dChamferDegree=dCenA/PI*180.0-90.0;
         m_ptEccR3=QPointF(m_ptEccR2.x()-dCenDistance*cos(dCenA),m_ptEccR2.y()+dCenDistance*sin(dCenA));
         m_ptEccP1=QPointF(m_ptEccR1.x()-m_dREcc*cos(dAngle),m_ptEccR1.y()-m_dREcc*sin(dAngle));
         m_ptEccP2=QPointF(m_ptEccR1.x()+m_dREcc*cos(dAngle),m_ptEccR1.y()+m_dREcc*sin(dAngle));
@@ -217,7 +233,7 @@ void Cell::CreatePoint()
     }
     else if(dCX1<=dCX2&&dCY1<=dCY2)
     {
-        m_dDrawEccAngle=90.0-dCenA/PI*180.0;
+        m_dChamferDegree=90.0-dCenA/PI*180.0;
         m_ptEccR3=QPointF(m_ptEccR2.x()+dCenDistance*cos(dCenA),m_ptEccR2.y()+dCenDistance*sin(dCenA));
         m_ptEccP1=QPointF(m_ptEccR1.x()-m_dREcc*cos(dAngle),m_ptEccR1.y()+m_dREcc*sin(dAngle));
         m_ptEccP2=QPointF(m_ptEccR1.x()+m_dREcc*cos(dAngle),m_ptEccR1.y()-m_dREcc*sin(dAngle));
@@ -226,7 +242,7 @@ void Cell::CreatePoint()
     }
     else if(dCX1<=dCX2&&dCY1>=dCY2)
     {
-        m_dDrawEccAngle=90.0+dCenA/PI*180.0;
+        m_dChamferDegree=90.0+dCenA/PI*180.0;
         m_ptEccR3=QPointF(m_ptEccR2.x()+dCenDistance*cos(dCenA),m_ptEccR2.y()-dCenDistance*sin(dCenA));
         m_ptEccP1=QPointF(m_ptEccR1.x()+m_dREcc*cos(dAngle),m_ptEccR1.y()+m_dREcc*sin(dAngle));
         m_ptEccP2=QPointF(m_ptEccR1.x()-m_dREcc*cos(dAngle),m_ptEccR1.y()-m_dREcc*sin(dAngle));
@@ -235,7 +251,7 @@ void Cell::CreatePoint()
     }
     else
     {
-        m_dDrawEccAngle=270.0-dCenA/PI*180.0;
+        m_dChamferDegree=270.0-dCenA/PI*180.0;
         m_ptEccR3=QPointF(m_ptEccR2.x()-dCenDistance*cos(dCenA),m_ptEccR2.y()-dCenDistance*sin(dCenA));
         m_ptEccP1=QPointF(m_ptEccR1.x()+m_dREcc*cos(dAngle),m_ptEccR1.y()-m_dREcc*sin(dAngle));
         m_ptEccP2=QPointF(m_ptEccR1.x()-m_dREcc*cos(dAngle),m_ptEccR1.y()+m_dREcc*sin(dAngle));
@@ -257,16 +273,16 @@ void Cell::CreatePath()
     m_pathCen=cenPath;
     //偏心轴外形
     QPainterPath eccPath;
-    eccPath.arcMoveTo(m_pPan->Radius2Rect(m_ptEccR1.x(), m_ptEccR1.y(), m_dREcc),m_dDrawEccAngle);
-    eccPath.arcTo(m_pPan->Radius2Rect(m_ptEccR1.x(), m_ptEccR1.y(), m_dREcc),m_dDrawEccAngle,180.0);
-    eccPath.lineTo(m_pPan->Op2Vp(m_ptEccP4));
-    eccPath.arcTo(m_pPan->Radius2Rect(m_ptEccR3.x(), m_ptEccR3.y(), m_dREcc),m_dDrawEccAngle+180.0,180.0);
-    eccPath.closeSubpath();
-//    eccPath.moveTo(m_pPan->Op2Vp(m_ptEccP1));
-//    eccPath.lineTo(m_pPan->Op2Vp(m_ptEccP2));
-//    eccPath.lineTo(m_pPan->Op2Vp(m_ptEccP3));
+//    eccPath.arcMoveTo(m_pPan->Radius2Rect(m_ptEccR1.x(), m_ptEccR1.y(), m_dREcc),m_dChamferDegree);
+//    eccPath.arcTo(m_pPan->Radius2Rect(m_ptEccR1.x(), m_ptEccR1.y(), m_dREcc),m_dChamferDegree,180.0);
 //    eccPath.lineTo(m_pPan->Op2Vp(m_ptEccP4));
-//    eccPath.lineTo(m_pPan->Op2Vp(m_ptEccP1));
+//    eccPath.arcTo(m_pPan->Radius2Rect(m_ptEccR3.x(), m_ptEccR3.y(), m_dREcc),m_dChamferDegree+180.0,180.0);
+//    eccPath.closeSubpath();
+    eccPath.moveTo(m_pPan->Op2Vp(m_ptEccP1));
+    eccPath.lineTo(m_pPan->Op2Vp(m_ptEccP2));
+    eccPath.lineTo(m_pPan->Op2Vp(m_ptEccP3));
+    eccPath.lineTo(m_pPan->Op2Vp(m_ptEccP4));
+    eccPath.lineTo(m_pPan->Op2Vp(m_ptEccP1));
     m_pathEcc=eccPath;
     //画运行轨迹
     CreateArc();
@@ -283,24 +299,24 @@ void Cell::CreateArc()
         QPointF p=QPointF(m_dCenterX,m_dCenterY);
         arcPath.moveTo(m_pPan->Op2Vp(p));
         //当前总共运行的度数进行分割
-        if(m_nRunDegree-m_nStartDegree>=m_nEccRunDegree)
+        if(m_nCenRadSlice>=m_nEccRadSlice)
         {
-            for(int nCen=1;nCen<=m_nCurrentCenDegree;nCen++)
+            for(int nCen=1;nCen<=m_nCurrentCenSlice;nCen++)
             {
                 int nEcc=0;
-                if(m_nRunDegree-m_nStartDegree-nCen<m_nEccRunDegree)
+                if(m_nCenRadSlice-nCen<m_nEccRadSlice)
                 {
-                    if(nCen<=m_nRunDegree-m_nStartDegree)
+                    if(nCen<=m_nCenRadSlice)
                     {
-                        nEcc=nCen-m_nRunDegree+m_nStartDegree+m_nEccRunDegree;
+                        nEcc=nCen-m_nCenRadSlice+m_nEccRadSlice;
                     }
                 }
-                if(nCen>m_nCurrentCenDegree)
-                    nCen=m_nCurrentCenDegree;
-                if(nEcc>m_nEccRunDegree)
-                   nEcc=m_nEccRunDegree;
-                double dCenCurrent=double(nCen)/SPLIT_DEGREE/180.0*PI;
-                double dEccCurrent=double(nEcc)/SPLIT_DEGREE/180.0*PI;
+                if(nCen>m_nCurrentCenSlice)
+                    nCen=m_nCurrentCenSlice;
+                if(nEcc>m_nEccRadSlice)
+                   nEcc=m_nEccRadSlice;
+                double dCenCurrent=double(nCen)/SLICE_RATIO;
+                double dEccCurrent=double(nEcc)/SLICE_RATIO;
                 dRadius=sqrt(m_dRunEcc*m_dRunEcc+m_dRunEcc*m_dRunEcc-2*m_dRunEcc*m_dRunEcc*cos(dEccCurrent));
                 dSpread=(PI-dEccCurrent)/2.0;
                 p=QPointF(m_dCenterX+dRadius*cos(dCenCurrent+dSpread),m_dCenterY-dRadius*sin(dCenCurrent+dSpread));
@@ -309,14 +325,14 @@ void Cell::CreateArc()
         }
         else
         {
-            for(int nCen=1,nEcc=1;nCen<=m_nCurrentCenDegree||nEcc<=m_nCurrentEccDegree;nCen++,nEcc++)
+            for(int nCen=1,nEcc=1;nCen<=m_nCurrentCenSlice||nEcc<=m_nCurrentEccSlice;nCen++,nEcc++)
             {
-                if(nCen>m_nCurrentCenDegree)
-                    nCen=m_nCurrentCenDegree;
-                if(nEcc>m_nEccRunDegree)
-                    nEcc=m_nEccRunDegree;
-                double dCenCurrent=double(nCen)/SPLIT_DEGREE/180.0*PI;
-                double dEccCurrent=double(nEcc)/SPLIT_DEGREE/180.0*PI;
+                if(nCen>m_nCurrentCenSlice)
+                    nCen=m_nCurrentCenSlice;
+                if(nEcc>m_nEccRadSlice)
+                    nEcc=m_nEccRadSlice;
+                double dCenCurrent=double(nCen)/SLICE_RATIO;
+                double dEccCurrent=double(nEcc)/SLICE_RATIO;
                 dRadius=sqrt(m_dRunEcc*m_dRunEcc+m_dRunEcc*m_dRunEcc-2*m_dRunEcc*m_dRunEcc*cos(dEccCurrent));
                 dSpread=(PI-dEccCurrent)/2.0;
                 p=QPointF(m_dCenterX+dRadius*cos(dCenCurrent+dSpread),m_dCenterY-dRadius*sin(dCenCurrent+dSpread));
@@ -337,15 +353,15 @@ void Cell::CreateArc()
         for(int nC=0,nE=0;nC<m_nWavePos&&nE<m_nWavePos;nC++,nE++)
         {
             if(m_nCenWave[nC]!=BYTE_NULL)
-                nCurrentCen+=m_nCenWave[nC]*SPLIT_DEGREE;
+                nCurrentCen+=m_nCenWave[nC]*SLICE_RATIO;
             if(m_nEccWave[nE]!=BYTE_NULL)
-                nCurrentEcc+=m_nEccWave[nE]*SPLIT_DEGREE;
-            double dDiffCen=double(nCurrentCen-nLastCen)/SPLIT_DEGREE;
-            double dDiffEcc=double(nCurrentEcc-nLastEcc)/SPLIT_DEGREE;
-            for(int n=1;n<=SPLIT_DEGREE;n++)
+                nCurrentEcc+=m_nEccWave[nE]*SLICE_RATIO;
+            double dDiffCen=double(nCurrentCen-nLastCen)/SLICE_RATIO;
+            double dDiffEcc=double(nCurrentEcc-nLastEcc)/SLICE_RATIO;
+            for(int n=1;n<=SLICE_RATIO;n++)
             {
-                double dCenCurrent=double(nLastCen+n*dDiffCen)/SPLIT_DEGREE/180.0*PI;
-                double dEccCurrent=double(nLastEcc+n*dDiffEcc)/SPLIT_DEGREE/180.0*PI;
+                double dCenCurrent=double(nLastCen+n*dDiffCen)/SLICE_RATIO;
+                double dEccCurrent=double(nLastEcc+n*dDiffEcc)/SLICE_RATIO;
                 dRadius=sqrt(m_dRunEcc*m_dRunEcc+m_dRunEcc*m_dRunEcc-2*m_dRunEcc*m_dRunEcc*cos(dEccCurrent));
                 dSpread=(PI-dEccCurrent)/2.0;
                 p=QPointF(m_dCenterX+dRadius*cos(dCenCurrent+dSpread),m_dCenterY-dRadius*sin(dCenCurrent+dSpread));
