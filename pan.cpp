@@ -231,7 +231,8 @@ QRect Pan::Radius2Rect(double dx, double dy, double dR)
     QPoint leftTop = Op2Vp(left, top);
     QPoint rightBottom = Op2Vp(right, bottom);
     //矩形，起始点，宽和高
-    return QRect(leftTop.x(),leftTop.y(),rightBottom.x()-leftTop.x(),rightBottom.y()-leftTop.y());
+    return QRect(leftTop.x(),leftTop.y(),
+                 rightBottom.x()-leftTop.x(),rightBottom.y()-leftTop.y());
 }
 
 void Pan::Draw()
@@ -240,7 +241,6 @@ void Pan::Draw()
     for (int i = 1; i <= CELL_NUM;i++)
     {
         CreateCellPath(i);
-        m_bRunEnd=false;
     }
     //检测相交区域
     CheckIntersects();
@@ -313,188 +313,6 @@ void Pan::SetEccPosValue(int nID, int nPos, int nValue)
     m_pCell[nID-1]->m_nEccWave[nPos-1]=nValue;
 }
 
-void Pan::PlayRun()
-{
-    killTimer(m_nRunTimerID);
-    switch(m_nPlayIndex)
-    {
-    case 0:
-        m_nSliceIndex++;
-        m_bRunEnd=true;
-        m_nPosIndex++;
-        m_nPlayIndex++;
-        break;
-    case 1:
-        SetCellValue();
-        m_nPlayIndex++;
-        break;
-    case 2:
-        if(m_bRunEnd)
-        {
-            PlayOver();
-            return;
-        }
-        else
-        {
-            m_nPlayIndex++;
-        }
-        break;
-    case 3:
-        CheckIntersects();
-        m_nPlayIndex++;
-        break;
-    case 4:
-        if(m_bPauseStatus)
-        {
-            m_bRunStatus=false;
-            return;
-        }
-        else
-        {
-            m_nPlayIndex++;
-        }
-        break;
-    case 5:
-        m_nPlayIndex=0;
-        m_pPaintArea->update();
-        break;
-    default:
-        return;
-    }
-    m_nRunTimerID=this->startTimer(RUN_TIME);
-}
-
-void Pan::PlayOver()
-{
-    m_nPosIndex=0;
-    m_nPlayIndex=0;
-    m_bRunStatus=false;
-    QString s="运行完成！";
-    emit ShowText(s);
-    QMessageBox::information(m_pPaintArea, "运行提示", "运行完成！",
-                             QMessageBox::Ok | QMessageBox::Cancel);
-}
-
-void Pan::PlayDeal()
-{
-    killTimer(m_nDealTimerID);
-    switch(m_nPlayIndex)
-    {
-    case 0:
-        m_nPosIndex++;
-        m_nPlayIndex++;
-    case 1:
-        if(m_nPosIndex<=m_nCellWavePos)
-        {
-            for(int i=0;i<m_nRunNum;i++)
-            {
-                SetCellWavePos(m_nRunID[i],m_nPosIndex);
-                SetCellRunStatus(m_nRunID[i],false);
-                SetCellEccRadius(m_nRunID[i],MIN_RADIUS);
-                CreateCellPath(m_nRunID[i]);
-            }
-        }
-        else
-        {
-            m_nPosIndex=0;
-            m_nPlayIndex=0;
-            QMessageBox::information(m_pPaintArea, "运行提示", "结果运行完成！",
-                                     QMessageBox::Ok | QMessageBox::Cancel);
-            return;
-        }
-        m_nPlayIndex++;
-    case 2:
-        CheckIntersects();
-        m_nPlayIndex++;
-    case 3:
-        m_pPaintArea->update();
-        m_nPlayIndex++;
-    case 4:
-        m_nPlayIndex=0;
-        break;
-    default:
-        return;
-    }
-    m_nDealTimerID=this->startTimer(RUN_TIME);
-}
-
-void Pan::SetCellValue()
-{
-    for (int i = 0; i < m_nRunNum;i++)
-    {
-        //中心轴先展开
-        if(m_nSliceIndex <= CenTargetSlice(m_nRunID[i]))
-        {
-            SetCellCenSlice(m_nRunID[i],m_nSliceIndex);
-            m_bRunEnd=false;
-        }
-        //中心轴剩余展开度数与偏心轴度数相同或小于时，偏心轴开始展开
-        if(CenTargetSlice(m_nRunID[i])-m_nSliceIndex<EccTargetSlice(m_nRunID[i]))
-        {
-            if(CenTargetSlice(m_nRunID[i])>=EccTargetSlice(m_nRunID[i])&&
-               m_nSliceIndex<=CenTargetSlice(m_nRunID[i]))
-            {
-                SetCellEccSlice(m_nRunID[i],m_nSliceIndex-CenTargetSlice(m_nRunID[i])+EccTargetSlice(m_nRunID[i]));
-                m_bRunEnd=false;
-            }
-            else if(CenTargetSlice(m_nRunID[i])<EccTargetSlice(m_nRunID[i])&&
-                                   m_nSliceIndex<=EccTargetSlice(m_nRunID[i]))
-            {
-                SetCellEccSlice(m_nRunID[i],m_nSliceIndex);
-                m_bRunEnd=false;
-            }
-        }
-        else
-        {
-            SetCellEccSlice(m_nRunID[i],0);
-        }
-        SetCellRunStatus(m_nRunID[i],true);
-        SetCellEccRadius(m_nRunID[i],MAX_RADIUS);
-        CreateCellPath(m_nRunID[i]);
-    }
-}
-
-void Pan::CheckIntersects()
-{
-    //检测可能发生碰撞的两个单元，通过运行半径与所在单元的距离
-    m_nPathIndex=0;
-    for (int i = 0; i < m_nRunNum;i++)
-    {
-        for(int j=i+1;j<m_nRunNum;j++)
-        {
-            QString sTemp;
-            QPainterPath path1=m_pCell[m_nRunID[i]-1]->GetCenPath();
-            QPainterPath path2=m_pCell[m_nRunID[i]-1]->GetEccPath();
-            QPainterPath path3=m_pCell[m_nRunID[j]-1]->GetCenPath();
-            QPainterPath path4=m_pCell[m_nRunID[j]-1]->GetEccPath();
-            bool b1=path1.intersects(path4);
-            bool b2=path2.intersects(path3);
-            bool b3=path2.intersects(path4);
-            if(b1)
-            {
-                m_pathInsertects[m_nPathIndex]=path1.intersected(path4);
-                m_nPathIndex++;
-                sTemp.sprintf("单元%02d的中心轴与单元%02d的偏心轴碰撞！",m_nRunID[i],m_nRunID[j]);
-                emit ShowText(sTemp);
-            }
-            if(b2)
-            {
-                m_pathInsertects[m_nPathIndex]=path2.intersected(path3);
-                m_nPathIndex++;
-                sTemp.sprintf("单元%02d的偏心轴与单元%02d的中心轴碰撞！",m_nRunID[i],m_nRunID[j]);
-                emit ShowText(sTemp);
-            }
-            if(b3)
-            {
-                m_pathInsertects[m_nPathIndex]=path2.intersected(path4);
-                m_nPathIndex++;
-                sTemp.sprintf("单元%02d的偏心轴与单元%02d的偏心轴碰撞！",m_nRunID[i],m_nRunID[j]);
-                emit ShowText(sTemp);
-            }
-        }
-    }
-}
-
 int Pan::CenFinalPos(int nID)
 {
     int nPos=1;
@@ -557,6 +375,197 @@ int Pan::CellEccPosValue(int nID, int nPos)
 void Pan::CreateCellPath(int nID)
 {
      m_pCell[nID-1]->CreatePath();
+}
+
+void Pan::PlayRun()
+{
+    killTimer(m_nRunTimerID);
+    switch(m_nPlayIndex)
+    {
+    case 0:
+        m_nSliceIndex++;
+        m_bRunEnd=true;
+        m_nPosIndex++;
+        m_nPlayIndex++;
+        break;
+    case 1:
+        SetCellValue();
+        m_nPlayIndex++;
+        break;
+    case 2:
+        if(m_bRunEnd)
+        {
+            PlayOver();
+            return;
+        }
+        else
+        {
+            m_nPlayIndex++;
+        }
+        break;
+    case 3:
+        CheckIntersects();
+        m_nPlayIndex++;
+        break;
+    case 4:
+        if(m_bPauseStatus)
+        {
+            m_bRunStatus=false;
+            return;
+        }
+        else
+        {
+            m_nPlayIndex++;
+        }
+        break;
+    case 5:
+        m_nPlayIndex=0;
+        m_pPaintArea->update();
+        break;
+    default:
+        return;
+    }
+    m_nRunTimerID=this->startTimer(RUN_TIME);
+}
+
+void Pan::PlayOver()
+{
+    m_nPosIndex=0;
+    m_nPlayIndex=0;
+    m_bRunStatus=false;
+    QString s="运行完成！";
+    emit ShowText(s);
+//    QMessageBox::information(m_pPaintArea, "运行提示", "运行完成！",
+//                             QMessageBox::Ok | QMessageBox::Cancel);
+}
+
+void Pan::PlayDeal()
+{
+    killTimer(m_nDealTimerID);
+    switch(m_nPlayIndex)
+    {
+    case 0:
+        m_nPosIndex++;
+        m_nPlayIndex++;
+    case 1:
+        if(m_nPosIndex<=m_nCellWavePos)
+        {
+            for(int i=0;i<m_nRunNum;i++)
+            {
+                SetCellWavePos(m_nRunID[i],m_nPosIndex);
+                SetCellRunStatus(m_nRunID[i],false);
+                SetCellEccRadius(m_nRunID[i],MIN_RADIUS);
+                CreateCellPath(m_nRunID[i]);
+            }
+        }
+        else
+        {
+            m_nPosIndex=0;
+            m_nPlayIndex=0;
+//            QMessageBox::information(m_pPaintArea, "运行提示", "结果运行完成！",
+//                                     QMessageBox::Ok | QMessageBox::Cancel);
+            return;
+        }
+        m_nPlayIndex++;
+    case 2:
+        CheckIntersects();
+        m_nPlayIndex++;
+    case 3:
+        m_pPaintArea->update();
+        m_nPlayIndex++;
+    case 4:
+        m_nPlayIndex=0;
+        break;
+    default:
+        return;
+    }
+    m_nDealTimerID=this->startTimer(RUN_TIME);
+}
+
+void Pan::SetCellValue()
+{
+    for (int i = 0; i < m_nRunNum;i++)
+    {
+        //中心轴先展开
+        if(m_nSliceIndex <= CenTargetSlice(m_nRunID[i]))
+        {
+            SetCellCenSlice(m_nRunID[i],m_nSliceIndex);
+            m_bRunEnd=false;
+        }
+        //中心轴剩余展开度数与偏心轴度数相同或小于时，偏心轴开始展开
+        if(CenTargetSlice(m_nRunID[i])-m_nSliceIndex<EccTargetSlice(m_nRunID[i]))
+        {
+            if(CenTargetSlice(m_nRunID[i])>=EccTargetSlice(m_nRunID[i])&&
+               m_nSliceIndex<=CenTargetSlice(m_nRunID[i]))
+            {
+                SetCellEccSlice(m_nRunID[i],m_nSliceIndex-CenTargetSlice(m_nRunID[i])
+                                +EccTargetSlice(m_nRunID[i]));
+                m_bRunEnd=false;
+            }
+            else if(CenTargetSlice(m_nRunID[i])<EccTargetSlice(m_nRunID[i])&&
+                                   m_nSliceIndex<=EccTargetSlice(m_nRunID[i]))
+            {
+                SetCellEccSlice(m_nRunID[i],m_nSliceIndex);
+                m_bRunEnd=false;
+            }
+        }
+        else
+        {
+            SetCellEccSlice(m_nRunID[i],0);
+        }
+        SetCellRunStatus(m_nRunID[i],true);
+        SetCellEccRadius(m_nRunID[i],MAX_RADIUS);
+        CreateCellPath(m_nRunID[i]);
+    }
+}
+
+void Pan::CheckIntersects()
+{
+    //检测可能发生碰撞的两个单元，通过运行半径与所在单元的距离
+    m_nPathIndex=0;
+    for (int i = 0; i < m_nRunNum;i++)
+    {
+        for(int j = 1;j <= CELL_NUM;j++)
+        {
+            int nDistance=sqrt((m_pCell[m_nRunID[i]-1]->GetCenterX()-m_pCell[j-1]->GetCenterX())
+                              *(m_pCell[m_nRunID[i]-1]->GetCenterX()-m_pCell[j-1]->GetCenterX())
+                              +(m_pCell[m_nRunID[i]-1]->GetCenterY()-m_pCell[j-1]->GetCenterY())
+                              *(m_pCell[m_nRunID[i]-1]->GetCenterY()-m_pCell[j-1]->GetCenterY()));
+            if(m_nRunID[i]!=j&&nDistance<CELL_SPACE)
+            {
+                QString sTemp;
+                QPainterPath path1=m_pCell[m_nRunID[i]-1]->GetCenPath();
+                QPainterPath path2=m_pCell[m_nRunID[i]-1]->GetEccPath();
+                QPainterPath path3=m_pCell[j-1]->GetCenPath();
+                QPainterPath path4=m_pCell[j-1]->GetEccPath();
+                bool b1=path1.intersects(path4);
+                bool b2=path2.intersects(path3);
+                bool b3=path2.intersects(path4);
+                if(b1)
+                {
+                    m_pathInsertects[m_nPathIndex]=path1.intersected(path4);
+                    m_nPathIndex++;
+                    sTemp.sprintf("单元%02d的中心轴与单元%02d的偏心轴碰撞！",m_nRunID[i],j);
+                    emit ShowText(sTemp);
+                }
+                if(b2)
+                {
+                    m_pathInsertects[m_nPathIndex]=path2.intersected(path3);
+                    m_nPathIndex++;
+                    sTemp.sprintf("单元%02d的偏心轴与单元%02d的中心轴碰撞！",m_nRunID[i],j);
+                    emit ShowText(sTemp);
+                }
+                if(b3)
+                {
+                    m_pathInsertects[m_nPathIndex]=path2.intersected(path4);
+                    m_nPathIndex++;
+                    sTemp.sprintf("单元%02d的偏心轴与单元%02d的偏心轴碰撞！",m_nRunID[i],j);
+                    emit ShowText(sTemp);
+                }
+            }
+
+        }
+    }
 }
 
 int Pan::DetectCollision(int nID, int mID)

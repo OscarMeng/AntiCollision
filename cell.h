@@ -35,10 +35,10 @@ private:
     double m_dLenghtP2;            //中心轴起始时4点相当于坐标原点（圆心）的长度
     double m_dLenghtP3;            //中心轴起始时4点相当于坐标原点（圆心）的长度
     double m_dLenghtP4;            //中心轴起始时4点相当于坐标原点（圆心）的长度
-    double m_dAngleP1;             //中心轴起始时4点相当于坐标x轴的偏转角度
-    double m_dAngleP2;             //中心轴起始时4点相当于坐标x轴的偏转角度
-    double m_dAngleP3;             //中心轴起始时4点相当于坐标x轴的偏转角度
-    double m_dAngleP4;             //中心轴起始时4点相当于坐标x轴的偏转角度
+    double m_dRadianP1;            //中心轴起始时4点相当于坐标x轴的偏转弧度
+    double m_dRadianP2;            //中心轴起始时4点相当于坐标x轴的偏转弧度
+    double m_dRadianP3;            //中心轴起始时4点相当于坐标x轴的偏转弧度
+    double m_dRadianP4;            //中心轴起始时4点相当于坐标x轴的偏转弧度
 
     QPointF m_ptEccP1;             //偏心轴外形矩形点
     QPointF m_ptEccP2;             //偏心轴外形矩形点
@@ -72,18 +72,20 @@ private:
     int          m_nWavePos;            //轴波形位置
     bool         m_bRunStatus;          //一般运行状态
 public:
-    void   InitCell(Pan* pPan, double dRadius, double dRadian);
-    QRect  CalRect();
-    void   Draw();
-    void   DrawArc();//运行半径小于中心轴m_dCen+偏心轴m_dEcc，运行要到达的角度从x正轴开始，小于等于2*PI
-    void   DrawCenEcc();//画中心轴和偏心轴
-    void   DrawUnexpanded();//画未展开的中心轴和偏心轴
-    void   DrawTargetPos();//画目标点
-    double LengthByPoint(const QPointF pointF);
-    void   CalCurrentRadSlice();
-    void   CreatePoint();
-    void   CreatePath();
-    void   CreateArc();
+    void    InitCell(Pan* pPan, double dRadius, double dRadian);
+    QRect   CalRect();
+    void    Draw();
+    void    DrawArc();//运行半径小于中心轴m_dCen+偏心轴m_dEcc，运行要到达的角度从x正轴开始，小于等于2*PI
+    void    DrawCenEcc();//画中心轴和偏心轴
+    void    DrawUnexpanded();//画未展开的中心轴和偏心轴
+    void    DrawTargetPos();//画目标点
+    double  LengthByPoint(const QPointF pointF);
+    double  LengthByPoint(const QPointF point1,const QPointF point2);
+    void    CalCurrentRadSlice();
+    QPointF CalPointBySlice(int nCenSlice,int nEccSlice);//通过中心轴，偏心轴弧度片，计算光纤点
+    void    CreatePoint();
+    void    CreatePath();
+    void    CreateArc();
 
 public:
     inline void SetPainter(QPainter* pPainter)      {m_pPainter = pPainter;}
@@ -98,7 +100,7 @@ public:
     inline double  GetCenterX()                     {return m_dCenterX;}
     inline double  GetCenterY()                     {return m_dCenterY;}
     inline void SetWavePos(int nWavePos)            {m_nWavePos=nWavePos;}
-    inline void SetEccRadius(double dR)             {m_dREcc=dR;}
+    inline void SetEccRadius(double dRadius)        {m_dREcc=dRadius;}
     inline QPainterPath GetCenPath()                {return m_pathCen;}
     inline QPainterPath GetEccPath()                {return m_pathEcc;}
 signals:
