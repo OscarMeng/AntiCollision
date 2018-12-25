@@ -13,7 +13,7 @@ class Cell : public QObject
 {
     Q_OBJECT
 public:
-    explicit Cell(int nID, int nStatus, double dCenterX, double dCenterY);
+    explicit Cell(int nID, bool bStatus, double dCenterX, double dCenterY);
     virtual ~Cell();
 public:
     Pan*             m_pPan;
@@ -54,7 +54,7 @@ private:
 
 private:
     int          m_nID;                 //单元编号
-    int          m_nStatus;             //单元是否选中运行的，0否，1是
+    bool         m_bStatus;             //单元是否选中运行的，0否，1是
     double       m_dCenterX;            //单元中心X
     double       m_dCenterY;            //单元中心Y
     double       m_dRadius;             //单元运行半径
@@ -70,7 +70,7 @@ private:
     int          m_nCurrentCenSlice;    //当前中心轴展开的弧度片，rad*100，相对于x轴正方向
     int          m_nCurrentEccSlice;    //当前偏心轴展开的弧度片，rad*100，相对于中心轴负方向
     int          m_nWavePos;            //轴波形位置
-    bool         m_bRunStatus;          //一般运行状态
+    bool         m_bRunStyle;           //运行方式，一般运行，处理运行
 public:
     void    InitCell(Pan* pPan, double dRadius, double dRadian);
     QRect   CalRect();
@@ -91,7 +91,7 @@ public:
     inline void SetPainter(QPainter* pPainter)      {m_pPainter = pPainter;}
     inline void SetCurrentCenSlice(int nSlice)      {m_nCurrentCenSlice=nSlice;}
     inline void SetCurrentEccSlice(int nSlice)      {m_nCurrentEccSlice=nSlice;}
-    inline void SetRunStatus(bool bStatus)          {m_bRunStatus=bStatus;}
+    inline void SetRunStyle(bool bStyle)            {m_bRunStyle=bStyle;}
     inline int  GetCurrentCenSlice()                {return m_nCurrentCenSlice;}
     inline int  GetCurrentEccSlice()                {return m_nCurrentEccSlice;}
     inline int  GetCenRadSlice()                    {return m_nCenRadSlice;}
@@ -99,6 +99,7 @@ public:
     inline int  GetRadius()                         {return m_dRadius;}
     inline double  GetCenterX()                     {return m_dCenterX;}
     inline double  GetCenterY()                     {return m_dCenterY;}
+    inline bool    GetRunStatus()                   {return m_bStatus;}
     inline void SetWavePos(int nWavePos)            {m_nWavePos=nWavePos;}
     inline void SetEccRadius(double dRadius)        {m_dREcc=dRadius;}
     inline QPainterPath GetCenPath()                {return m_pathCen;}

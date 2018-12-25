@@ -90,7 +90,7 @@ public:
     QRect   Radius2Rect(double dx,double dy,double dR);//视图点和半径转换rect
     void	Draw();						//绘制单元
 
-    int     CenTargetSlice(int nID);                       //中心轴到目标跨度的弧度片
+    int     CenTargetSlice(int nID);                      //中心轴到目标跨度的弧度片
     int     EccTargetSlice(int nID);                      //偏心轴到目标位置的弧度片
     int     CalCenSlice(int nID, int nPos);               //计算单元中心轴已转动过的弧度片
     int     CalEccSlice(int nID, int nPos);               //计算单元偏心轴已转动过的弧度片
@@ -103,8 +103,9 @@ public:
     void    SetCellEccRadius(int nID,double dRadius);//设置偏心轴单元半径
     int     CellCenPosValue(int nID,int nPos);//某单元中心轴波形的某位置值
     int     CellEccPosValue(int nID,int nPos);//某单元中心轴波形的某位置值
-    int     CenFinalPos(int nID);             //中心轴波形被赋值的最终位置值
-    int     EccFinalPos(int nID);             //偏心轴波形被赋值的最终位置值
+    bool    CellRunStatus(int nID);           //某单元是否运行
+    int     CellCenFinalPos(int nID);             //中心轴波形被赋值的最终位置值
+    int     CellEccFinalPos(int nID);             //偏心轴波形被赋值的最终位置值
 
     void    PlayRun();                 //一般运行
     void    PlayDeal();                //运行处理碰撞之后的波形
@@ -118,7 +119,7 @@ public:
     void    CheckCollision();          //碰撞检测
     int     DetectCollision(int nID,int mID);            //检测碰撞并返回值
     void    DealCollision(int nID, int mID ,int nPos ,int nResult);//处理碰撞
-    void    DealNearPos(int nID,int mID, int nPos);          //处理周边单元的每个位置是否碰撞
+    void    DealNearCell(int nID,int mID, int nPos);          //处理周边单元的每个位置是否碰撞
     void    DealEachPos(int nID,int mID,int nPos);  //处理两个单元每个位置是否碰撞
     void    DealCen(int nID,int nPos);              //碰撞时处理中心轴，不能在运行时有后退
     void    DealEcc(int nID,int nPos);              //碰撞时处理偏心轴，不能在运行时有后退

@@ -6,8 +6,8 @@
 /// \param dCenterX
 /// \param dCenterY
 ///
-Cell::Cell(int nID, int nStatus, double dCenterX, double dCenterY)
-: m_nID(nID), m_nStatus(nStatus), m_dCenterX(dCenterX), m_dCenterY(dCenterY)
+Cell::Cell(int nID, bool bStatus, double dCenterX, double dCenterY)
+: m_nID(nID), m_bStatus(bStatus), m_dCenterX(dCenterX), m_dCenterY(dCenterY)
 {
     m_nCurrentCenSlice=0;
     m_nCurrentEccSlice=0;
@@ -19,7 +19,7 @@ Cell::Cell(int nID, int nStatus, double dCenterX, double dCenterY)
     m_nStartRadSlice=0;
     m_nRunRadSlice=0;
     m_nWavePos=0;
-    m_bRunStatus=true;
+    m_bRunStyle=true;
     m_dREcc=MAX_RADIUS;
     m_ptCenP1=QPointF(-2.75,-3.9);
     m_ptCenP2=QPointF(-2.75,-6.9);
@@ -74,7 +74,7 @@ void Cell::InitCell(Pan *pPan, double dRadius, double dRadian)
                               /(2 * m_dRadius*m_dRunEcc));//三角形余弦定理
     }
     //保证弧度大于0
-    if(m_nStatus==RUN_STATUS)
+    if(m_bStatus)
     {
         m_dCenRadian=m_dRunRadian-m_dStartRadian;
         m_nCenRadSlice=qRound(m_dCenRadian*SLICE_RATIO);
@@ -82,13 +82,29 @@ void Cell::InitCell(Pan *pPan, double dRadius, double dRadian)
         m_nEccRadSlice=qRound(m_dEccRadian*SLICE_RATIO);
         m_nStartRadSlice=qRound(m_dStartRadian*SLICE_RATIO);
         m_nRunRadSlice=qRound(m_dRunRadian*SLICE_RATIO);
+        //单元中心轴、偏心轴波形赋值
         for(int i=0;i<m_nCenRadSlice;i++)
         {
             m_nCenWave[i]=BYTE_RUN;
         }
-        for(int j=0;j<m_nEccRadSlice;j++)
+
+        if(m_nEccRadSlice<=m_nCenRadSlice)
         {
-            m_nEccWave[j]=BYTE_RUN;
+            for(int i=0;i<m_nCenRadSlice-m_nEccRadSlice;i++)
+            {
+                m_nEccWave[i]=BYTE_STOP;
+            }
+            for(int j=m_nCenRadSlice-m_nEccRadSlice;j<m_nCenRadSlice;j++)
+            {
+                m_nEccWave[j]=BYTE_RUN;
+            }
+        }
+        else
+        {
+            for(int j=0;j<m_nEccRadSlice;j++)
+            {
+                m_nEccWave[j]=BYTE_RUN;
+            }
         }
     }
 }
@@ -102,7 +118,7 @@ void Cell::Draw()
 {
     //画圆
     m_rRect = CalRect();//每重画一次，都要计算一次
-    if(m_nStatus==RUN_STATUS)
+    if(m_bStatus)
     {
         DrawArc();//画运行轨迹
         DrawCenEcc();//画展开的中心轴和偏心轴
@@ -219,7 +235,7 @@ QPointF Cell::CalPointBySlice(int nCenSlice, int nEccSlice)
 
 void Cell::CreatePoint()
 {
-    if(!m_bRunStatus&&m_nStatus==RUN_STATUS)
+    if(!m_bRunStyle&&m_bStatus)
     {
         CalCurrentRadSlice();
     }
@@ -315,7 +331,7 @@ void Cell::CreateArc()
     int nEccSlice=0;
     QPointF ptFiber=QPointF(m_dCenterX,m_dCenterY);
     arcPath.moveTo(m_pPan->Op2Vp(ptFiber));
-    if(m_bRunStatus)
+    if(m_bRunStyle)
     {//一般运行状态
         //当前总共运行的弧度片进行分割
         for( ;nCenSlice<=m_nCurrentCenSlice||nEccSlice<=m_nCurrentEccSlice;

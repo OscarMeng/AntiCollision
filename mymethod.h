@@ -22,7 +22,7 @@
 #define BYTE_NULL    -2            //单元空时波值
 #define MAX_RADIUS   2.3           //偏心轴大半径
 #define MIN_RADIUS   2.1           //偏心轴小半径
-
+#define DEAL_SLICE   30            //碰撞处理片数
 #define NEW_NUM      313           //新单元数
 #define NEW_ROW      21            //新行数
 #define NEW_SPACE    45            //新单元间距
