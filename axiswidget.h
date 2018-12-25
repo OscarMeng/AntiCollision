@@ -32,14 +32,14 @@ public:
     QPoint       m_ptXEnd;
     QString      m_sTitle;
     QString      m_sID;
-    bool         m_bCen;
+    bool         m_bCenEcc;
     QString      m_sData;
 public:
     void    DrawArrow();
     void    DrawAxisText();
     void    DrawAmplitude();
 public slots:
-    void    ReceiveValue(QString sID,bool bCen,QString sData);
+    void    ReceiveValue(QString sID,bool bCenEcc,QString sData);
 };
 
 #endif // AXISWIDGET_H

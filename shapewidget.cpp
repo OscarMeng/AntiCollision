@@ -45,10 +45,8 @@ ShapeWidget::~ShapeWidget()
 
 void ShapeWidget::ReceiveCenShape(QString sID, QString sData)
 {
-    m_sCen=sData;
     if(m_bCenBtn)
     {
-        m_sID=sID;
         m_pCellIDEdit->setText(sID);
         m_pTextEdit->setText(sData);
         emit SendValue(sID,m_bCenBtn,sData);
@@ -58,10 +56,8 @@ void ShapeWidget::ReceiveCenShape(QString sID, QString sData)
 
 void ShapeWidget::ReceiveEccShape( QString sID,QString sData)
 {
-    m_sEcc=sData;
     if(!m_bCenBtn)
     {
-        m_sID=sID;
         m_pCellIDEdit->setText(sID);
         m_pTextEdit->setText(sData);
         emit SendValue(sID,m_bCenBtn,sData);
@@ -85,6 +81,7 @@ void ShapeWidget::PressCenBtn()
                 sc+=QString::number(m_pPan->CellCenPosValue(nID,i));
             }
         }
+        m_pTextEdit->setText(sc);
         emit SendValue(sID,m_bCenBtn,sc);
         m_pAxis->update();
     }
@@ -106,6 +103,7 @@ void ShapeWidget::PressEccBtn()
                 se+=QString::number(m_pPan->CellEccPosValue(nID,i));
             }
         }
+        m_pTextEdit->setText(se);
         emit SendValue(sID,m_bCenBtn,se);
         m_pAxis->update();
     }

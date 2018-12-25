@@ -35,14 +35,11 @@ public:
     QHBoxLayout *m_pCellLayout;
     QGridLayout *m_pMainLayout;
 public:
-    QString   m_sCen;
-    QString   m_sEcc;
-    QString   m_sID;
     bool      m_bCenBtn;//默认中心轴数据
 public:
 
 signals:
-    void    SendValue(QString sID,bool bCen,QString sData);
+    void    SendValue(QString sID,bool bCenEcc,QString sData);//单元号，中心轴还是偏心轴，数据发送给坐标轴
 public slots:
     void    ReceiveCenShape(QString sID,QString sData);
     void    ReceiveEccShape(QString sID,QString sData);

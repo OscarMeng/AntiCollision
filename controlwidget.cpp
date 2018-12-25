@@ -123,34 +123,28 @@ void ControlWidget::ClearText()
 
 void ControlWidget::SetProgressBar()
 {
-    int nCenDegree=0;
-    int nEccDegree=0;
-    int nC=0;
-    int nE=0;
+    int nCenPos=0;
+    int nEccPos=0;
     for(int i=0;i<m_pPan->m_nRunNum;i++)
     {
-        if(nCenDegree<m_pPan->CenTargetSlice(m_pPan->m_nRunID[i]))
+        if(nCenPos<m_pPan->CellCenFinalPos(m_pPan->m_nRunID[i]))
         {
-            nCenDegree=m_pPan->CenTargetSlice(m_pPan->m_nRunID[i]);
-            nC=i;
+            nCenPos=m_pPan->CellCenFinalPos(m_pPan->m_nRunID[i]);
         }
-        if(nEccDegree<m_pPan->EccTargetSlice(m_pPan->m_nRunID[i]))
+        if(nEccPos<m_pPan->CellEccFinalPos(m_pPan->m_nRunID[i]))
         {
-            nEccDegree=m_pPan->EccTargetSlice(m_pPan->m_nRunID[i]);
-            nE=i;
+            nEccPos=m_pPan->CellEccFinalPos(m_pPan->m_nRunID[i]);
         }
     }
-    int nDegree;
-//    if(nCenDegree>=nEccDegree)
-//    {
-//        nDegree=m_pPan->CalCenSlice(m_pPan->m_nRunID[nC]);
-//        m_pProgressBar->setValue(double(nDegree)/nCenDegree*999);
-//    }
-//    else
-//    {
-//        nDegree=m_pPan->CalEccSlice(m_pPan->m_nRunID[nE]);
-//        m_pProgressBar->setValue(double(nDegree)/nEccDegree*999);
-//    }
+    int nPos=m_pPan->GetWavePos();
+    if(nCenPos>=nEccPos)
+    {
+        m_pProgressBar->setValue(double(nPos+1)/nCenPos*999);
+    }
+    else
+    {
+        m_pProgressBar->setValue(double(nPos+1)/nEccPos*999);
+    }
 }
 
 

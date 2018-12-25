@@ -12,7 +12,7 @@ AxisWidget::AxisWidget(ShapeWidget *pShape):m_pShape(pShape)
     m_ptXStart=QPoint(0,0);
     m_ptXEnd=QPoint(0,0);
     m_sID=1;
-    m_bCen=true;
+    m_bCenEcc=true;
     m_sData="";
     m_sTitle="";
 
@@ -46,6 +46,7 @@ void AxisWidget::paintEvent(QPaintEvent *e)
     DrawArrow();
     //xy轴标语
     DrawAxisText();
+    //画Y轴幅值
     DrawAmplitude();
     m_pPainter->end();
 }
@@ -61,7 +62,7 @@ void AxisWidget::DrawAxisText()
     m_pPainter->rotate(-90);//以(0,0)点坐标原点选择，最后右下角坐标显示,x,y轴为旋转之后的
     m_pPainter->drawText(-m_nHeight/2-15,m_nOffset/2,tr("Y轴幅值"));
     m_pPainter->rotate(90);
-    m_pPainter->drawText(m_ptXEnd.x()-50,m_ptXEnd.y()+20,tr("X轴位置"));
+    m_pPainter->drawText(m_ptXEnd.x()-50,m_ptXEnd.y()+40,tr("X轴位置"));
     m_pPainter->drawText(m_ptXStart.x()-10,m_ptXStart.y()+5,tr("0"));
     m_pPainter->drawText(m_ptXStart.x()-10,m_ptXStart.y()-m_nHeight/4+5,tr("1"));
     m_pPainter->drawText(m_ptXStart.x()-14,m_ptXStart.y()+m_nHeight/4+5,tr("-1"));
@@ -69,7 +70,7 @@ void AxisWidget::DrawAxisText()
                          m_ptXStart.x()+5,m_ptXStart.y()-m_nHeight/4);
     m_pPainter->drawLine(m_ptXStart.x(),m_ptXStart.y()+m_nHeight/4,
                          m_ptXStart.x()+5,m_ptXStart.y()+m_nHeight/4);
-    if(m_bCen)
+    if(m_bCenEcc)
         m_sTitle="中心轴";
     else
         m_sTitle="偏心轴";
@@ -80,30 +81,47 @@ void AxisWidget::DrawAmplitude()
 {
     if(!m_sData.isEmpty())
     {
-        QPen pen(QColor(255, 0, 0), 1.4, Qt::SolidLine,Qt::SquareCap,Qt::MiterJoin);
-        m_pPainter->setPen(pen);
-        QStringList strList=m_sData.split("");//把所有的多余的空格为间隔,正则表达式QRegExp("[\\s]+")
-        QPoint point;
+        QPen penAmp(QColor(255, 0, 0), 1.4, Qt::SolidLine,Qt::SquareCap,Qt::MiterJoin);
+        QPen penDash(QColor(100, 0, 0), 0.5, Qt::DashLine,Qt::SquareCap,Qt::MiterJoin);
+        QPen penText(QColor(65, 70, 80), 1.0, Qt::SolidLine,Qt::SquareCap,Qt::MiterJoin);
+
+        QStringList strList=m_sData.split("");//分隔
+        QPointF point;
+        bool b0=false;
+        bool b1=false;
         for(int i=0;i<strList.size();i++)
         {
             if(strList[i]=="0")
             {
-                point=QPoint(m_ptXStart.x()+i,m_ptXStart.y());
+                point=QPointF(m_ptXStart.x()+i*0.5,m_ptXStart.y());
+                m_pPainter->setPen(penAmp);
                 m_pPainter->drawPoint(point);
+                if(b1)
+                {
+                    m_pPainter->setPen(penDash);
+                    m_pPainter->drawLine(m_ptXStart.x()+i*0.5-0.25,m_ptXStart.y(),
+                                         m_ptXStart.x()+i*0.5-0.25,m_ptXStart.y()-m_nHeight/4);
+                    m_pPainter->setPen(penText);
+                    m_pPainter->drawLine(m_ptXStart.x()+i*0.5-0.25,m_ptXStart.y(),
+                                         m_ptXStart.x()+i*0.5-0.25,m_ptXStart.y()-5);
+                    QString s=QString::number(i,10);
+                    m_pPainter->drawText(m_ptXStart.x()+i*0.5-0.25,m_ptXStart.y()+20,tr(s));
+                }
             }
             else if(strList[i]=="1")
             {
-                point=QPoint(m_ptXStart.x()+i,m_ptXStart.y()-m_nHeight/4);
+                point=QPointF(m_ptXStart.x()+i*0.5,m_ptXStart.y()-m_nHeight/4);
+                m_pPainter->setPen(penAmp);
                 m_pPainter->drawPoint(point);
             }
         }
     }
 }
 
-void AxisWidget::ReceiveValue(QString sID, bool bCen, QString sData)
+void AxisWidget::ReceiveValue(QString sID, bool bCenEcc, QString sData)
 {
     m_sID=sID;
-    m_bCen=bCen;
+    m_bCenEcc=bCenEcc;
     m_sData=sData;
 }
 

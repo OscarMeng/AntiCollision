@@ -54,14 +54,13 @@ public:
     int                 m_nSliceIndex;              //弧度片展开索引
     int                 m_nPathIndex;               //每检测一次重叠区域个数
     int                 m_nPlayIndex;               //运行索引
-    bool                m_bRunStatus;               //运行状态
+    bool                m_bRunStatus;               //运行状态，在运行为true
     bool                m_bRunEnd;                  //运行完成
-    bool                m_bPauseStatus;             //暂停状态
-    bool                m_bTargetSlice;             //目标弧度片
+    bool                m_bPause;                   //暂停状态
+    bool                m_bDealEnd;                 //处理完成
     QString             m_sFilePath;                //读取文件路径
     int                 m_nPosIndex;                //单元波形位置索引
     int                 m_nCellWavePos;             //单元波形的位置
-    bool                m_bSolutionStatus;          //单元处理方案状态
 public:
     QPainter*  m_pPainter;          //传递绘画
     double	   m_dZoom;			    //缩放比
@@ -90,6 +89,7 @@ public:
     QRect   Radius2Rect(double dx,double dy,double dR);//视图点和半径转换rect
     void	Draw();						//绘制单元
 
+    int     CellDistance(int nID,int mID);                //两单元之间的距离
     int     CenTargetSlice(int nID);                      //中心轴到目标跨度的弧度片
     int     EccTargetSlice(int nID);                      //偏心轴到目标位置的弧度片
     int     CalCenSlice(int nID, int nPos);               //计算单元中心轴已转动过的弧度片
@@ -109,14 +109,13 @@ public:
 
     void    PlayRun();                 //一般运行
     void    PlayDeal();                //运行处理碰撞之后的波形
-    void    PlayOver();                //运行之后重置
     void    PlaySolution();            //碰撞解决方案
     void    SetCellValue();            //一般直接运行时设置单元中心轴偏心值
     void    CreateCellPath(int nID);   //生成单元轮廓和轨迹
     void    CheckIntersects();         //检测碰撞并显示
 
-    void    DealSolution();            //碰撞处理方案
-    void    CheckCollision();          //碰撞检测
+    void    DealCellPos();             //处理单元位置
+    void    DealSolution();            //碰撞检测处理
     int     DetectCollision(int nID,int mID);            //检测碰撞并返回值
     void    DealCollision(int nID, int mID ,int nPos ,int nResult);//处理碰撞
     void    DealNearCell(int nID,int mID, int nPos);          //处理周边单元的每个位置是否碰撞
@@ -130,6 +129,7 @@ public:
     inline  double	GetZoom()								{ return m_dZoom; }
     inline  int		GetWidth()                              { return int(m_nCellsX * 2 * m_dZoom);}
     inline  int		GetHeight()                             { return int(m_nCellsY * 2 * m_dZoom);}
+    inline  int     GetWavePos()                            { return m_nCellWavePos;}
 
 public:
     void timerEvent(QTimerEvent *event);
@@ -144,7 +144,7 @@ public slots:
     void    ResetRun();
     void    CheckEndStatus();
     void    OverInitPan(QString sPath);
-    void    CalculateRun();
+    void    PlanSolution();
     void    RunShape();
 };
 

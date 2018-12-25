@@ -82,7 +82,7 @@ void Cell::InitCell(Pan *pPan, double dRadius, double dRadian)
         m_nEccRadSlice=qRound(m_dEccRadian*SLICE_RATIO);
         m_nStartRadSlice=qRound(m_dStartRadian*SLICE_RATIO);
         m_nRunRadSlice=qRound(m_dRunRadian*SLICE_RATIO);
-        //单元中心轴、偏心轴波形赋值
+        //单元中心轴、偏心轴波形赋值,只赋到已有的值,处理碰撞时继续赋值
         for(int i=0;i<m_nCenRadSlice;i++)
         {
             m_nCenWave[i]=BYTE_RUN;
@@ -203,17 +203,20 @@ void Cell::CalCurrentRadSlice()
 {
     int nCenSlice=0;
     int nEccSlice=0;
-    for(int i=0;i<m_nWavePos;i++)
+    if(m_bStatus)
     {
-        int n=m_nCenWave[i];
-        int m=m_nEccWave[i];
-        if(n!=BYTE_NULL)
+        for(int i=0;i<m_nWavePos;i++)
         {
-            nCenSlice+=n;
-        }
-        if(m!=BYTE_NULL)
-        {
-            nEccSlice+=m;
+            int n=m_nCenWave[i];
+            int m=m_nEccWave[i];
+            if(n!=BYTE_NULL)
+            {
+                nCenSlice+=n;
+            }
+            if(m!=BYTE_NULL)
+            {
+                nEccSlice+=m;
+            }
         }
     }
     m_nCurrentCenSlice=nCenSlice;
