@@ -27,7 +27,7 @@ ControlWidget::ControlWidget(Pan *pPan) : m_pPan(pPan)
     connect(m_pCheckBtn,SIGNAL(clicked()),m_pPan,SLOT(CheckEndStatus()));
 
     m_pCalculateBtn=new QPushButton(tr("处理碰撞"));
-    connect(m_pCalculateBtn,SIGNAL(clicked()),m_pPan,SLOT(CalculateRun()));
+    connect(m_pCalculateBtn,SIGNAL(clicked()),m_pPan,SLOT(PlanSolution()));
     m_pProgressBar=new QProgressBar;
     m_pProgressBar->setRange(0,999);
     m_pProgressBar->setValue(0);

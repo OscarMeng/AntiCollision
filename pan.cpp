@@ -22,6 +22,7 @@ Pan::Pan(PaintArea *pArea, int nCenterX, int nCenterY):m_pPaintArea(pArea)
         m_nRunID[i] = -1;
         m_dRunRadius[i] = -1;
         m_dRunRadian[i] = -1;
+        m_bCellDeal[i] = false;
     }
     m_pCoord = new Coord;
     InitPan();
@@ -701,13 +702,15 @@ void Pan::DealCollision(int nID, int mID, int nPos, int nResult)
     int nEE=nResult%10;      //n偏心轴与m偏心轴相碰，偏心轴至少有一个是展开的
     if(nCE)
     {
-        //nID单元不运动
-        if(!CellRunStatus(nID))
+        //nID单元不运动或中心轴转动到目标位置
+        if(CenTargetSlice(nID)==CalCenSlice(nID,nPos))
         {
-            if(CenTargetSlice(mID)-CalCenSlice(mID,nPos)<=EccTargetSlice(mID)-CalEccSlice(mID,nPos))
+            //当前位置数已经大于mID中心轴目标位置，只能处理中心轴
+            if(CenTargetSlice(mID)<nPos)
             {
                 DealCen(mID,nPos);
             }
+            //当前mID中心轴还在转动，处理偏心轴
             else
             {
                 DealEcc(mID,nPos);
@@ -716,14 +719,14 @@ void Pan::DealCollision(int nID, int mID, int nPos, int nResult)
         else
         {
             DealEcc(mID,nPos);
+            DealEcc(mID,nPos);
         }
     }
     if(nEC)
     {
-        //偏心轴一定是展开的
-        if(!CellRunStatus(mID))
+        if(CenTargetSlice(mID)==CalCenSlice(mID,nPos))
         {
-            if(CenTargetSlice(nID)-CalCenSlice(nID,nPos)<=EccTargetSlice(nID)-CalEccSlice(nID,nPos))
+            if(CenTargetSlice(nID)<nPos)
             {
                 DealCen(nID,nPos);
             }
@@ -735,27 +738,83 @@ void Pan::DealCollision(int nID, int mID, int nPos, int nResult)
         else
         {
             DealEcc(nID,nPos);
+            DealEcc(nID,nPos);
         }
     }
     if(nEE)
     {
-        //有偏心轴是不运动的
-        if(EccTargetSlice(nID)==0)
+        //nID单元不运动或单元回到原位，mID单元处理
+        if(CalCenSlice(nID,nPos)==0&&CalEccSlice(nID,nPos)==0)
         {
-            DealEcc(mID,nPos);
+            //mID的中心轴还在转动
+            if(CalCenSlice(mID,nPos)<CenTargetSlice(mID))
+            {
+                DealEcc(mID,nPos);
+            }
+            //mID中心轴已到达目标位置
+            else
+            {
+                DealCen(mID,nPos);
+            }
         }
-        else if(EccTargetSlice(mID)==0)
+
+        else if(CalCenSlice(mID,nPos)==0&&CalEccSlice(mID,nPos)==0)
         {
+            //nID的中心轴还在转动
+            if(CalCenSlice(nID,nPos)<CenTargetSlice(nID))
+            {
+                DealEcc(nID,nPos);
+            }
+            //nID中心轴已到达目标位置
+            else
+            {
+                DealCen(nID,nPos);
+            }
+        }
+        else if(CalEccSlice(nID,nPos)==0&&CellRunStatus(nID))
+        {
+            DealCen(nID,nPos);
+        }
+        else if(CalEccSlice(mID,nPos)==0&&CellRunStatus(mID))
+        {
+            DealCen(mID,nPos);
+        }
+        else if(m_bCellDeal[nID])
+        {
+            if(CalCenSlice(mID,nPos)==nPos)
+            {
+                DealEcc(mID,nPos);
+            }
+            else
             DealEcc(nID,nPos);
+        }
+        else if(m_bCellDeal[mID])
+        {
+            if(CalCenSlice(nID,nPos)==nPos)
+            {
+                DealEcc(nID,nPos);
+            }
+            else
+            DealEcc(mID,nPos);
         }
         //两个偏心轴都运动，偏心轴展开需要少的处理
         else if(EccTargetSlice(nID)-CalEccSlice(nID,nPos)<=EccTargetSlice(mID)-CalEccSlice(mID,nPos))
         {
-           DealEcc(nID,nPos);
+            m_bCellDeal[nID]=true;
+            DealEcc(nID,nPos);
+            if(CalCenSlice(mID,nPos)==nPos)
+            {
+                DealEcc(mID,nPos);
+            }
         }
         else if(EccTargetSlice(nID)-CalEccSlice(nID,nPos)>EccTargetSlice(mID)-CalEccSlice(mID,nPos))
         {
-           DealEcc(mID,nPos);
+            m_bCellDeal[mID]=true;
+            DealEcc(mID,nPos);
+            if(CalCenSlice(nID,nPos)==nPos)
+            {
+                DealEcc(nID,nPos);
+            }
         }
     }
 }

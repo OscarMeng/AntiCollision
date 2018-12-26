@@ -61,6 +61,7 @@ public:
     QString             m_sFilePath;                //读取文件路径
     int                 m_nPosIndex;                //单元波形位置索引
     int                 m_nCellWavePos;             //单元波形的位置
+    bool                m_bCellDeal[CELL_NUM];      //单元偏心轴与偏心轴碰撞处理记录
 public:
     QPainter*  m_pPainter;          //传递绘画
     double	   m_dZoom;			    //缩放比

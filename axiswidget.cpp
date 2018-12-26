@@ -59,10 +59,10 @@ void AxisWidget::DrawAxisText()
     font.setPointSize(10);
     m_pPainter->setFont(font);
 
-    m_pPainter->rotate(-90);//以(0,0)点坐标原点选择，最后右下角坐标显示,x,y轴为旋转之后的
+    m_pPainter->rotate(-90);//以(0,0)点坐标原点选择，+顺时针，-逆时针，最后右下角坐标显示,x,y轴为旋转之后的
     m_pPainter->drawText(-m_nHeight/2-15,m_nOffset/2,tr("Y轴幅值"));
     m_pPainter->rotate(90);
-    m_pPainter->drawText(m_ptXEnd.x()-50,m_ptXEnd.y()+40,tr("X轴位置"));
+    m_pPainter->drawText(m_ptXEnd.x()-50,m_ptXEnd.y()+35,tr("X轴位置"));
     m_pPainter->drawText(m_ptXStart.x()-10,m_ptXStart.y()+5,tr("0"));
     m_pPainter->drawText(m_ptXStart.x()-10,m_ptXStart.y()-m_nHeight/4+5,tr("1"));
     m_pPainter->drawText(m_ptXStart.x()-14,m_ptXStart.y()+m_nHeight/4+5,tr("-1"));
@@ -85,19 +85,22 @@ void AxisWidget::DrawAmplitude()
         QPen penDash(QColor(100, 0, 0), 0.5, Qt::DashLine,Qt::SquareCap,Qt::MiterJoin);
         QPen penText(QColor(65, 70, 80), 1.0, Qt::SolidLine,Qt::SquareCap,Qt::MiterJoin);
 
-        QStringList strList=m_sData.split("");//分隔
+        QStringList strList=m_sData.split("");//分割字符串
         QPointF point;
         bool b0=false;
         bool b1=false;
-        for(int i=0;i<strList.size();i++)
+        int nSize=strList.size()-2;//分割时前后多出两个空，0位置和最后位置为空
+        for(int i=1;i<=nSize;i++)
         {
             if(strList[i]=="0")
             {
+                b0=true;
                 point=QPointF(m_ptXStart.x()+i*0.5,m_ptXStart.y());
                 m_pPainter->setPen(penAmp);
                 m_pPainter->drawPoint(point);
                 if(b1)
                 {
+                    b1=false;
                     m_pPainter->setPen(penDash);
                     m_pPainter->drawLine(m_ptXStart.x()+i*0.5-0.25,m_ptXStart.y(),
                                          m_ptXStart.x()+i*0.5-0.25,m_ptXStart.y()-m_nHeight/4);
@@ -105,15 +108,54 @@ void AxisWidget::DrawAmplitude()
                     m_pPainter->drawLine(m_ptXStart.x()+i*0.5-0.25,m_ptXStart.y(),
                                          m_ptXStart.x()+i*0.5-0.25,m_ptXStart.y()-5);
                     QString s=QString::number(i,10);
-                    m_pPainter->drawText(m_ptXStart.x()+i*0.5-0.25,m_ptXStart.y()+20,tr(s));
+                    m_pPainter->setPen(penText);
+                    m_pPainter->translate(m_ptXStart.x()+i*0.5-0.25,m_ptXStart.y());
+                    m_pPainter->rotate(60);//以(0,0)点坐标原点选择，+顺时针，-逆时针，最后右下角坐标显示,x,y轴为旋转之后的
+                    m_pPainter->drawText(2,5,s);
+                    m_pPainter->rotate(-60);//以(0,0)点坐标原点选择，+顺时针，-逆时针，最后右下角坐标显示,x,y轴为旋转之后的
+                    m_pPainter->translate(-m_ptXStart.x()-i*0.5+0.25,-m_ptXStart.y());
                 }
             }
             else if(strList[i]=="1")
             {
+                b1=true;
                 point=QPointF(m_ptXStart.x()+i*0.5,m_ptXStart.y()-m_nHeight/4);
                 m_pPainter->setPen(penAmp);
                 m_pPainter->drawPoint(point);
+                if(b0)
+                {
+                    b0=false;
+                    m_pPainter->setPen(penDash);
+                    m_pPainter->drawLine(m_ptXStart.x()+i*0.5-0.25,m_ptXStart.y(),
+                                         m_ptXStart.x()+i*0.5-0.25,m_ptXStart.y()-m_nHeight/4);
+                    m_pPainter->setPen(penText);
+                    m_pPainter->drawLine(m_ptXStart.x()+i*0.5-0.25,m_ptXStart.y(),
+                                         m_ptXStart.x()+i*0.5-0.25,m_ptXStart.y()-5);
+                    QString s=QString::number(i,10);
+                    m_pPainter->setPen(penText);
+                    m_pPainter->translate(m_ptXStart.x()+i*0.5-0.25,m_ptXStart.y());
+                    m_pPainter->rotate(60);//以(0,0)点坐标原点选择，+顺时针，-逆时针，最后右下角坐标显示,x,y轴为旋转之后的
+                    m_pPainter->drawText(2,5,s);
+                    m_pPainter->rotate(-60);//以(0,0)点坐标原点选择，+顺时针，-逆时针，最后右下角坐标显示,x,y轴为旋转之后的
+                    m_pPainter->translate(-m_ptXStart.x()-i*0.5+0.25,-m_ptXStart.y());
+                }
             }
+        }
+        m_pPainter->setPen(penText);
+        m_pPainter->drawLine(m_ptXStart.x()+nSize*0.5-0.25,m_ptXStart.y(),
+                             m_ptXStart.x()+nSize*0.5-0.25,m_ptXStart.y()-5);
+        QString s=QString::number(nSize,10);
+        m_pPainter->setPen(penText);
+        m_pPainter->translate(m_ptXStart.x()+nSize*0.5-0.25,m_ptXStart.y());
+        m_pPainter->rotate(60);//以(0,0)点坐标原点选择，+顺时针，-逆时针，最后右下角坐标显示,x,y轴为旋转之后的
+        m_pPainter->drawText(2,5,s);
+        m_pPainter->rotate(-60);//以(0,0)点坐标原点选择，+顺时针，-逆时针，最后右下角坐标显示,x,y轴为旋转之后的
+        m_pPainter->translate(-m_ptXStart.x()-nSize*0.5+0.25,-m_ptXStart.y());
+        if(b1)
+        {
+            m_pPainter->setPen(penDash);
+            m_pPainter->drawLine(m_ptXStart.x()+nSize*0.5-0.25,m_ptXStart.y(),
+                                 m_ptXStart.x()+nSize*0.5-0.25,m_ptXStart.y()-m_nHeight/4);
         }
     }
 }

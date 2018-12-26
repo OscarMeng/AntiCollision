@@ -36,6 +36,7 @@ ShapeWidget::ShapeWidget(PaintArea *pPaintArea,Pan *pPan) : m_pPaintArea(pPaintA
     connect(m_pPan,SIGNAL(SendEccValue(QString,QString)),
             this,SLOT(ReceiveEccShape(QString,QString)));
     connect(this,SIGNAL(SendValue(QString,bool,QString)),m_pAxis,SLOT(ReceiveValue(QString,bool,QString)));
+    m_pCellIDEdit->setText("1");
 }
 
 ShapeWidget::~ShapeWidget()
