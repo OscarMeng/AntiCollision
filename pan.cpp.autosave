@@ -931,6 +931,7 @@ void Pan::DealEachPos(int nID, int mID, int nPos)
 
 void Pan::DealCen(int nID, int nPos)
 {
+    //处理之前把波形分段大于2，即为3段，最多只有3段，交换第2、3段移至成两段
     DealCenWave(nID,2);
     int nMove=0;
     for(int i=0;i<DEAL_SLICE;i++)
@@ -947,11 +948,15 @@ void Pan::DealCen(int nID, int nPos)
             SetCenPosValue(nID,nEnd,BYTE_RUN);
         }
     }
+    //处理之后，为3段的不处理，为4段，交换第2、3段移至成两段
+    //（4段：首先已到达目标位置，1段：处理的暂停DEAL_SLICE个位置；2段：到达目标位置运行的少DEAL_SLICE个的位置；
+    // 3段：到达目标位置后暂停的DEAL_SLICE个位置；4段：补充的DEAL_SLICE个位置后到达目标位置）
     DealCenWave(nID,3);
 }
 
 void Pan::DealEcc(int nID, int nPos)
 {
+    //处理之前把波形分段大于2，即为3段，最多只有3段，交换第2、3段移至成两段
     DealEccWave(nID,2);
     int nMove=0;
     for(int i=0;i<DEAL_SLICE;i++)
@@ -968,6 +973,9 @@ void Pan::DealEcc(int nID, int nPos)
             SetEccPosValue(nID,nEnd,BYTE_RUN);
         }
     }
+    //处理之后，为3段的不处理，为4段，交换第2、3段移至成两段
+    //（4段：首先已到达目标位置，1段：处理的暂停DEAL_SLICE个位置；2段：到达目标位置运行的少DEAL_SLICE个的位置；
+    // 3段：到达目标位置后暂停的DEAL_SLICE个位置；4段：补充的DEAL_SLICE个位置后到达目标位置）
     DealEccWave(nID,3);
 }
 

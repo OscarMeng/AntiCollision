@@ -154,6 +154,7 @@ public slots:
     void    PauseRun();
     void    ResetRun();
     void    CheckEndStatus();
+    void    CheckEndStatus();
     void    OverInitPan(QString sPath);
     void    PlanSolution();
     void    RunShape();
