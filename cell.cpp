@@ -77,6 +77,10 @@ void Cell::InitCell(Pan *pPan, double dRadius, double dRadian)
     if(m_bStatus)
     {
         m_dCenRadian=m_dRunRadian-m_dStartRadian;
+        if(m_dCenRadian<0)
+        {
+            m_dCenRadian+=2*PI;
+        }
         m_nCenRadSlice=qRound(m_dCenRadian*SLICE_RATIO);
         m_dEccRadian=PI-2*m_dStartRadian;
         m_nEccRadSlice=qRound(m_dEccRadian*SLICE_RATIO);
@@ -109,15 +113,15 @@ void Cell::InitCell(Pan *pPan, double dRadius, double dRadian)
     }
 }
 
-QRect Cell::CalRect()
+QRect Cell::CalRect(double dX,double dY,double dR)
 {
-    return m_pPan->Radius2Rect(m_dCenterX, m_dCenterY, m_dRadius);
+    return m_pPan->Radius2Rect(dX, dY, dR);
 }
+
 
 void Cell::Draw()
 {
     //画圆
-    m_rRect = CalRect();//每重画一次，都要计算一次
     if(m_bStatus)
     {
         DrawArc();//画运行轨迹
@@ -135,7 +139,7 @@ void Cell::Draw()
     QFont font;
     font.setPointSize(10);
     m_pPainter->setFont(font);
-    m_pPainter->drawText(m_rRect,Qt::AlignCenter,QString::number(m_nID,10));
+    m_pPainter->drawText(CalRect(m_dCenterX,m_dCenterY,STOP_RADIUS),Qt::AlignCenter,QString::number(m_nID,10));
 }
 
 void Cell::DrawArc()
@@ -238,6 +242,7 @@ QPointF Cell::CalPointBySlice(int nCenSlice, int nEccSlice)
 
 void Cell::CreatePoint()
 {
+    m_rRect = CalRect(m_dCenterX,m_dCenterY,m_dRadius);//每重画一次，都要计算一次
     if(!m_bRunStyle&&m_bStatus)
     {
         CalCurrentRadSlice();

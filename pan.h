@@ -61,7 +61,7 @@ public:
     QString             m_sFilePath;                //读取文件路径
     int                 m_nPosIndex;                //单元波形位置索引
     int                 m_nCellWavePos;             //单元波形的位置
-    bool                m_bCellDeal[CELL_NUM];      //单元偏心轴与偏心轴碰撞处理记录
+    bool                m_bCellDeal[CELL_NUM];      //单元是否已到达目标位置，不运动的单元默认为已到达目标位置
 public:
     QPainter*  m_pPainter;          //传递绘画
     double	   m_dZoom;			    //缩放比
@@ -75,6 +75,7 @@ public:
     QPen*      m_pDashPen[COLOR_AMOUNT];
     QPen*      m_pDddPen[COLOR_AMOUNT];
     QBrush*    m_bBrush[COLOR_AMOUNT];
+    QMap<QString,int> m_mapResult;
 public:
     void    InitPan();               //初始化Pan
     void    InitCheckCell();         //初始化Cell
@@ -107,6 +108,8 @@ public:
     bool    CellRunStatus(int nID);           //某单元是否运行
     int     CellCenFinalPos(int nID);             //中心轴波形被赋值的最终位置值
     int     CellEccFinalPos(int nID);             //偏心轴波形被赋值的最终位置值
+    QPainterPath CellCenPath(int nID);            //单元中心轴外形
+    QPainterPath CellEccPath(int nID);            //单元偏心轴外形
 
     void    PlayRun();                 //一般运行
     void    PlayDeal();                //运行处理碰撞之后的波形
@@ -119,10 +122,16 @@ public:
     void    DealSolution();            //碰撞检测处理
     int     DetectCollision(int nID,int mID);            //检测碰撞并返回值
     void    DealCollision(int nID, int mID ,int nPos ,int nResult);//处理碰撞
+    void    DealCenMethod(int nID, int mID , int nPos);//处理中心轴方法
+    void    DealEccMethod(int nID, int mID ,int nPos ,int nBasis);//处理偏心轴方法
+    void    SolutionBasis();
+    int     DealBasis(int nID, int mID);//判定处理方式的依据,nID单元偏心轴转动与mID目标位置的碰撞情况
     void    DealNearCell(int nID,int mID, int nPos);          //处理周边单元的每个位置是否碰撞
     void    DealEachPos(int nID,int mID,int nPos);  //处理两个单元每个位置是否碰撞
     void    DealCen(int nID,int nPos);              //碰撞时处理中心轴，不能在运行时有后退
     void    DealEcc(int nID,int nPos);              //碰撞时处理偏心轴，不能在运行时有后退
+    void    DealWave();
+    bool    WaveCollision(int nID,QVector<QVector<int>>& vWave,bool bCenEcc,int nRow);
 public:
     inline  void    SetCellCenter(int nX,int nY)            { m_nCellsX=nX;m_nCellsY=nY;}
     inline  void    SetPainter(QPainter* pPainter)          { m_pPainter = pPainter; }
@@ -135,7 +144,8 @@ public:
 public:
     void timerEvent(QTimerEvent *event);
 signals:
-    void ShowText(QString);
+    void SendCollision(int nID,int mID,bool bn,bool bm);
+    void ShowText(QString sTemp);
     void DealProgress();
     void SendCenValue(QString sID,QString sData);
     void SendEccValue(QString sID,QString sData);

@@ -38,9 +38,12 @@ ControlWidget::ControlWidget(Pan *pPan) : m_pPan(pPan)
     m_pShowText=new QTextEdit;
 
     m_pLabel=new QLabel(tr("信息如下:"));
-    connect(m_pPan,SIGNAL(ShowText(QString)),this,SLOT(SetTextEdit(QString)));
+
     m_pClearBtn=new QPushButton(tr("清空"));
     connect(m_pClearBtn,SIGNAL(clicked()),this,SLOT(ClearText()));
+
+    connect(m_pPan,SIGNAL(ShowText(QString)),this,SLOT(SetTextEdit(QString)));
+    connect(m_pPan,SIGNAL(SendCollision(int,int,bool,bool)),this,SLOT(ReceiveCollision(int,int,bool,bool)));
     m_pFileLayout=new QHBoxLayout();
     m_pFileLayout->setSpacing(10);
     m_pFileLayout->addWidget(m_pFilePath);
@@ -104,15 +107,41 @@ void ControlWidget::ChangeText()
     }
 }
 
-void ControlWidget::SetTextEdit(QString s)
+//槽函数不能直接调用槽函数，只能通过相应对象的信号调用
+void ControlWidget::ReceiveCollision(int nID, int mID, bool bn, bool bm)
 {
-    if(!m_sText.contains(s))
+    QString sTemp1;
+    QString sTemp2;
+    if(bn&&!bm)
     {
-        m_sText+=s;
+        sTemp1.sprintf("单元%02d的中心轴与单元%02d的偏心轴碰撞！",nID,mID);
+        sTemp2.sprintf("单元%02d的偏心轴与单元%02d的中心轴碰撞！",mID,nID);
+    }
+    if(!bn&&bm)
+    {
+        sTemp1.sprintf("单元%02d的偏心轴与单元%02d的中心轴碰撞！",nID,mID);
+        sTemp2.sprintf("单元%02d的中心轴与单元%02d的偏心轴碰撞！",mID,nID);
+    }
+    if(!bn&&!bm)
+    {
+        sTemp1.sprintf("单元%02d的偏心轴与单元%02d的偏心轴碰撞！",nID,mID);
+        sTemp2.sprintf("单元%02d的偏心轴与单元%02d的偏心轴碰撞！",mID,nID);
+    }
+    if(!m_sText.contains(sTemp1)&&!m_sText.contains(sTemp2))
+    {
+        emit m_pPan->ShowText(sTemp1);
+    }
+}
+
+void ControlWidget::SetTextEdit(QString sTemp)
+{
+    if(!m_sText.contains(sTemp))
+    {
+        m_sText+=sTemp;
         m_sText+="\n";
         m_pShowText->setText(m_sText);
+        m_pShowText->moveCursor(QTextCursor::End);//最下行显示
     }
-    m_pShowText->moveCursor(QTextCursor::End);//最下行显示
 }
 
 void ControlWidget::ClearText()

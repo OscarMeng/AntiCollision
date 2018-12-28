@@ -28,7 +28,8 @@ public slots:
     void OpenFile();
     void ReadPath();
     void ChangeText();
-    void SetTextEdit(QString s);
+    void ReceiveCollision(int nID,int mID,bool bn,bool bm);
+    void SetTextEdit(QString sTemp);
     void ClearText();
     void SetProgressBar();
 

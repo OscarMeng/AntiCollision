@@ -54,7 +54,7 @@ private:
 
 private:
     int          m_nID;                 //单元编号
-    bool         m_bStatus;             //单元是否选中运行的，0否，1是
+    bool         m_bStatus;             //单元是否运行的，0否，1是
     double       m_dCenterX;            //单元中心X
     double       m_dCenterY;            //单元中心Y
     double       m_dRadius;             //单元运行半径
@@ -73,7 +73,7 @@ private:
     bool         m_bRunStyle;           //运行方式，一般运行，处理运行
 public:
     void    InitCell(Pan* pPan, double dRadius, double dRadian);
-    QRect   CalRect();
+    QRect   CalRect(double dX,double dY,double dR);
     void    Draw();
     void    DrawArc();//运行半径小于中心轴m_dCen+偏心轴m_dEcc，运行要到达的角度从x正轴开始，小于等于2*PI
     void    DrawCenEcc();//画中心轴和偏心轴

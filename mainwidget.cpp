@@ -86,7 +86,7 @@ void MainWidget::SetUnitPos()
     {
         QDateTime time=QDateTime::currentDateTime();
         QString st=time.toString("yyyyMMddhhmmss");
-        QFile fp("/QAntiCollision/File/old/"+st+".txt");
+        QFile fp("/QAntiCollision/File/RandomPoint/"+st+".txt");
         int nCell[]={8,9,10,
                      15,16,17,18,19,20,21,22,
                      26,27,28,29,30,31,32,33,34,
@@ -102,9 +102,9 @@ void MainWidget::SetUnitPos()
             output<<str<<endl;
             for(int i=0;i<59;i++)
             {
-                double dR=double(850+rand()%850)/100;    //展开半径8.5~17mm之间
+                double dR=double(rand()%1700)/100;        //展开后单元中心到光纤点距离半径0~17mm
                 double dA=double(rand()%36000)/100;      //运行到的度数0~360°
-                str.sprintf("%-8d%-15f%-10d",nCell[i],dR,dA);
+                str.sprintf("%-8d%-15f%-10f",nCell[i],dR,dA);
                 output<<str<<endl;
             }
         }
