@@ -61,7 +61,7 @@ public:
     QString             m_sFilePath;                //读取文件路径
     int                 m_nPosIndex;                //单元波形位置索引
     int                 m_nCellWavePos;             //单元波形的位置
-    bool                m_bCellDeal[CELL_NUM];      //单元是否已到达目标位置，不运动的单元默认为已到达目标位置
+    bool                m_bDealRuned[CELL_NUM];     //单元是否已到达目标位置，不运动的单元默认为已到达目标位置
 public:
     QPainter*  m_pPainter;          //传递绘画
     double	   m_dZoom;			    //缩放比
@@ -99,7 +99,7 @@ public:
     void    SetCenPosValue(int nID, int nPos, int nValue);//设置单元中心轴某位置的值
     void    SetEccPosValue(int nID, int nPos, int nValue);//设置单元偏心轴某位置的值
     void    SetCellWavePos(int nID,int nPos); //设置单元波形当前位置，单元通过位置计算当前角度值
-    void    SetCellRunStatus(int nID,bool bStatus);//设置单元的状态，是运行还是处理
+    void    SetCellRunStyle(int nID,bool bStyle);//设置单元运行形式，是运行还是处理
     void    SetCellCenSlice(int nID,int nSlice);    //设置中心轴单元的度数
     void    SetCellEccSlice(int nID,int nSlice);    //设置偏心轴单元的度数
     void    SetCellEccRadius(int nID,double dRadius);//设置偏心轴单元半径
@@ -153,6 +153,7 @@ public slots:
     void    ShowRun();
     void    PauseRun();
     void    ResetRun();
+    void    DealRandom();
     void    CheckEndStatus();
     void    OverInitPan(QString sPath);
     void    PlanSolution();

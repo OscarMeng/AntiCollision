@@ -25,6 +25,8 @@ ControlWidget::ControlWidget(Pan *pPan) : m_pPan(pPan)
     connect(m_pResetBtn,SIGNAL(clicked()),m_pPan,SLOT(ResetRun()));
     m_pCheckBtn=new QPushButton(tr("检测"));//检测最终位置点是否碰撞，如果碰撞不能运行
     connect(m_pCheckBtn,SIGNAL(clicked()),m_pPan,SLOT(CheckEndStatus()));
+    m_pRandomBtn=new QPushButton(tr("处理随机"));//检测最终位置点是否碰撞，如果碰撞不能运行
+    connect(m_pRandomBtn,SIGNAL(clicked()),m_pPan,SLOT(CheckEndStatus()));
 
     m_pCalculateBtn=new QPushButton(tr("处理碰撞"));
     connect(m_pCalculateBtn,SIGNAL(clicked()),m_pPan,SLOT(PlanSolution()));

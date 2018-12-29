@@ -96,10 +96,11 @@ public:
     inline int  GetCurrentEccSlice()                {return m_nCurrentEccSlice;}
     inline int  GetCenRadSlice()                    {return m_nCenRadSlice;}
     inline int  GetEccRadSlice()                    {return m_nEccRadSlice;}
-    inline int  GetRadius()                         {return m_dRadius;}
+    inline double  GetRadius()                      {return m_dRadius;}
     inline double  GetCenterX()                     {return m_dCenterX;}
     inline double  GetCenterY()                     {return m_dCenterY;}
     inline bool    GetRunStatus()                   {return m_bStatus;}
+    inline double  GetRunRadian()                   {return m_dRunRadian;}
     inline void SetWavePos(int nWavePos)            {m_nWavePos=nWavePos;}
     inline void SetEccRadius(double dRadius)        {m_dREcc=dRadius;}
     inline QPainterPath GetCenPath()                {return m_pathCen;}
