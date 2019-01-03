@@ -31,6 +31,10 @@
 #define BASIS_CEN    1             //判断碰撞中心轴
 #define BASIS_ECC    2             //判断碰撞偏心轴
 #define BASIS_CEC    3             //判断碰撞中偏
+#define RUN_NULL     0             //不运行
+#define RUN_COM      1             //一般运行
+#define RUN_PLAN     2             //处理运行
+#define RUN_LAST     3             //结果运行
 
 #define COLOR_AMOUNT 9
 #define COLOR_NUM    0

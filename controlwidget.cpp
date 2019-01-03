@@ -8,7 +8,7 @@ ControlWidget::ControlWidget(Pan *pPan) : m_pPan(pPan)
 
     m_pFilePath=new QLabel(tr("文件路径:"));
     m_pLineText=new QLineEdit;
-    m_sFilePath="E:/QAntiCollision/File/CheckCenter.txt";
+    m_sFilePath="E:/QAntiCollision/File/OldUnit/CheckCenter.txt";
     m_pLineText->setText(m_sFilePath);
     m_pOpen=new QPushButton(tr("打开"));
     connect(m_pOpen,SIGNAL(clicked()),this,SLOT(OpenFile()));
@@ -17,30 +17,30 @@ ControlWidget::ControlWidget(Pan *pPan) : m_pPan(pPan)
     connect(this,SIGNAL(Path(QString)),m_pPan,SLOT(OverInitPan(QString)));
 
     m_pRunBtn=new QPushButton(tr("运行"));
-    connect(m_pRunBtn,SIGNAL(clicked()),m_pPan,SLOT(ShowRun()));
+    connect(m_pRunBtn,SIGNAL(clicked()),m_pPan,SLOT(CommonRun()));
     m_pPause=new QPushButton(tr("暂停"));
     connect(m_pPause,SIGNAL(clicked()),this,SLOT(ChangeText()));
     connect(m_pPause,SIGNAL(clicked()),m_pPan,SLOT(PauseRun()));
+    m_pStop=new QPushButton(tr("停止"));
+    connect(m_pStop,SIGNAL(clicked()),m_pPan,SLOT(StopRun()));
     m_pResetBtn=new QPushButton(tr("重置"));
     connect(m_pResetBtn,SIGNAL(clicked()),m_pPan,SLOT(ResetRun()));
     m_pCheckBtn=new QPushButton(tr("检测"));//检测最终位置点是否碰撞，如果碰撞不能运行
     connect(m_pCheckBtn,SIGNAL(clicked()),m_pPan,SLOT(CheckEndStatus()));
-    m_pRandomBtn=new QPushButton(tr("处理随机"));//检测最终位置点是否碰撞，如果碰撞不能运行
-    connect(m_pRandomBtn,SIGNAL(clicked()),m_pPan,SLOT(CheckEndStatus()));
+    m_pRandomBtn=new QPushButton(tr("处理随机"));//随机点最后位置会有不能运行的，进行处理
+    connect(m_pRandomBtn,SIGNAL(clicked()),m_pPan,SLOT(DealRandom()));
 
     m_pCalculateBtn=new QPushButton(tr("处理碰撞"));
-    connect(m_pCalculateBtn,SIGNAL(clicked()),m_pPan,SLOT(PlanSolution()));
+    connect(m_pCalculateBtn,SIGNAL(clicked()),m_pPan,SLOT(PlanRun()));
     m_pProgressBar=new QProgressBar;
     m_pProgressBar->setRange(0,999);
     m_pProgressBar->setValue(0);
     connect(m_pPan,SIGNAL(DealProgress()),this,SLOT(SetProgressBar()));
 
     m_pRunShapeBtn=new QPushButton(tr("结果运行"));
-    connect(m_pRunShapeBtn,SIGNAL(clicked()),m_pPan,SLOT(RunShape()));
+    connect(m_pRunShapeBtn,SIGNAL(clicked()),m_pPan,SLOT(LastRun()));
     m_pShowText=new QTextEdit;
-
     m_pLabel=new QLabel(tr("信息如下:"));
-
     m_pClearBtn=new QPushButton(tr("清空"));
     connect(m_pClearBtn,SIGNAL(clicked()),this,SLOT(ClearText()));
 
@@ -56,12 +56,14 @@ ControlWidget::ControlWidget(Pan *pPan) : m_pPan(pPan)
     m_pBtnLayout=new QGridLayout();
     m_pBtnLayout->setSpacing(10);
     m_pBtnLayout->addWidget(m_pCheckBtn,0,0,1,1);
-    m_pBtnLayout->addWidget(m_pRunBtn,0,1,1,1);
-    m_pBtnLayout->addWidget(m_pPause,0,2,1,1);
-    m_pBtnLayout->addWidget(m_pResetBtn,0,3,1,1);
-    m_pBtnLayout->addWidget(m_pCalculateBtn,1,0,1,1);
-    m_pBtnLayout->addWidget(m_pProgressBar,1,1,1,2);
-    m_pBtnLayout->addWidget(m_pRunShapeBtn,1,3,1,1);
+    m_pBtnLayout->addWidget(m_pRandomBtn,0,1,1,1);
+    m_pBtnLayout->addWidget(m_pResetBtn,0,2,1,1);
+    m_pBtnLayout->addWidget(m_pRunBtn,1,0,1,1);
+    m_pBtnLayout->addWidget(m_pPause,1,1,1,1);
+    m_pBtnLayout->addWidget(m_pStop,1,2,1,1);
+    m_pBtnLayout->addWidget(m_pCalculateBtn,2,0,1,1);
+    m_pBtnLayout->addWidget(m_pProgressBar,2,1,1,2);
+    m_pBtnLayout->addWidget(m_pRunShapeBtn,2,3,1,1);
 
     m_pInfoLayout =new QGridLayout();
     m_pInfoLayout->setSpacing(10);

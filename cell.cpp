@@ -19,8 +19,8 @@ Cell::Cell(int nID, bool bStatus, double dCenterX, double dCenterY)
     m_nStartRadSlice=0;
     m_nRunRadSlice=0;
     m_nWavePos=0;
-    m_bRunStyle=true;
-    m_dREcc=MAX_RADIUS;
+    m_nRunStyle=RUN_COM;//一般运行方式
+    m_dREcc=MAX_RADIUS; //偏心轴半径最大
     m_ptCenP1=QPointF(-2.75,-3.9);
     m_ptCenP2=QPointF(-2.75,-6.9);
     m_ptCenP3=QPointF(10.25,-6.9);
@@ -73,7 +73,7 @@ void Cell::InitCell(Pan *pPan, double dRadius, double dRadian)
         m_dStartRadian = acos((m_dRadius*m_dRadius + m_dRunEcc*m_dRunEcc - m_dRunEcc*m_dRunEcc)
                               /(2 * m_dRadius*m_dRunEcc));//三角形余弦定理
     }
-    //保证弧度大于0
+    //运行的单元，保证弧度大于0
     if(m_bStatus)
     {
         m_dCenRadian=m_dRunRadian-m_dStartRadian;
@@ -243,7 +243,7 @@ QPointF Cell::CalPointBySlice(int nCenSlice, int nEccSlice)
 void Cell::CreatePoint()
 {
     m_rRect = CalRect(m_dCenterX,m_dCenterY,m_dRadius);//每重画一次，都要计算一次
-    if(!m_bRunStyle&&m_bStatus)
+    if((m_nRunStyle==RUN_PLAN||m_nRunStyle==RUN_LAST)&&m_bStatus)
     {
         CalCurrentRadSlice();
     }
@@ -339,7 +339,7 @@ void Cell::CreateArc()
     int nEccSlice=0;
     QPointF ptFiber=QPointF(m_dCenterX,m_dCenterY);
     arcPath.moveTo(m_pPan->Op2Vp(ptFiber));
-    if(m_bRunStyle)
+    if(m_nRunStyle==RUN_COM)
     {//一般运行状态
         //当前总共运行的弧度片进行分割
         for( ;nCenSlice<=m_nCurrentCenSlice||nEccSlice<=m_nCurrentEccSlice;
@@ -361,7 +361,7 @@ void Cell::CreateArc()
             arcPath.lineTo(m_pPan->Op2Vp(ptFiber));
         }
     }
-    else
+    else if(m_nRunStyle==RUN_PLAN||m_nRunStyle==RUN_LAST)
     {//处理碰撞状态
         for(int nC=0,nE=0;nC<m_nWavePos&&nE<m_nWavePos;nC++,nE++)
         {

@@ -44,6 +44,7 @@ private:
     QPushButton *m_pRandomBtn;
     QPushButton *m_pRunBtn;
     QPushButton *m_pPause;
+    QPushButton *m_pStop;
     QPushButton *m_pResetBtn;
     QTextEdit   *m_pShowText;
     QPushButton *m_pCalculateBtn;

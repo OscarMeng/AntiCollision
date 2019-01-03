@@ -6,7 +6,7 @@ MainWidget::MainWidget(QWidget *parent)
 //如果设置了固定尺寸，各布局窗口大小的最小值要适合固定尺寸
 //    setFixedSize(1300,900);
     setWindowTitle(tr("LAMOST碰撞处理"));
-    m_bStyle=true;
+    m_bUnitStyle=true;
     m_pAntiArea=new AntiCollisionArea(m_pCtrlWidget,m_pShapeWidget);
     m_pCtrlWidget=new ControlWidget(m_pAntiArea->m_pPaintArea->m_pPan);
     m_pShapeWidget=new ShapeWidget(m_pAntiArea->m_pPaintArea,m_pAntiArea->m_pPaintArea->m_pPan);
@@ -64,7 +64,7 @@ MainWidget::~MainWidget()
 void MainWidget::SetOldUnit()
 {
     setWindowTitle(tr("LAMOST碰撞处理"));
-    m_bStyle=true;
+    m_bUnitStyle=true;
     m_pControlStack->setCurrentIndex(0);
     m_pShapeStack->setCurrentIndex(0);
 }
@@ -72,7 +72,7 @@ void MainWidget::SetOldUnit()
 void MainWidget::SetNewUnit()
 {
     setWindowTitle(tr("LAMOST新单元碰撞处理"));
-    m_bStyle=false;
+    m_bUnitStyle=false;
     m_pControlStack->setCurrentIndex(1);
     m_pShapeStack->setCurrentIndex(1);
 }
@@ -82,17 +82,22 @@ void MainWidget::SetUnitPos()
     QTime t=QTime::currentTime();
     qsrand(t.msec()+t.second()*1000);
 
-    if(m_bStyle)
+    if(m_bUnitStyle)
     {
         QDateTime time=QDateTime::currentDateTime();
         QString st=time.toString("yyyyMMddhhmmss");
-        QFile fp("/QAntiCollision/File/RandomPoint/"+st+".txt");
-        int nCell[]={8,9,10,
+        QFile fp("/QAntiCollision/File/OldUnit/RandomPoint/"+st+".txt");
+        int nCell[]={
                      15,16,17,18,19,20,21,22,
                      26,27,28,29,30,31,32,33,34,
-                     38,39,40,41,42,43,44,45,46,47,48,49,
-                     52,53,54,55,56,57,58,59,60,61,62,63,64,
-                     67,68,69,70,71,72,73,74,75,76,77,78,79,80
+                     40,41,42,43,44,45,46,47,48,
+                     54,55,56,57,58,59,60,61,62,
+//                     8,9,10,
+//                     15,16,17,18,19,20,21,22,
+//                     26,27,28,29,30,31,32,33,34,
+//                     38,39,40,41,42,43,44,45,46,47,48,49,
+//                     52,53,54,55,56,57,58,59,60,61,62,63,64,
+//                     67,68,69,70,71,72,73,74,75,76,77,78,79,80
                     };
         if(fp.open(QIODevice::ReadWrite | QIODevice::Text))
         {
@@ -100,10 +105,11 @@ void MainWidget::SetUnitPos()
             QString str;
             str.sprintf("%-8s%-15s%-10s","CellID","Radius","Angle");
             output<<str<<endl;
-            for(int i=0;i<59;i++)
+            for(int i=0;i<int(sizeof(nCell)/sizeof(nCell[0]));i++)
             {
-                double dR=double(rand()%1700)/100;        //展开后单元中心到光纤点距离半径0~17mm
-                double dA=double(rand()%36000)/100;      //运行到的度数0~360°
+                int nStart=400;
+                double dR=double(nStart+rand()%(1700-nStart))/100;            //展开后单元中心到光纤点距离半径0~17mm
+                double dA=double(rand()%36000)/100;                           //运行到的度数0~360°
                 str.sprintf("%-8d%-15f%-10f",nCell[i],dR,dA);
                 output<<str<<endl;
             }

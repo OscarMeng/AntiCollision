@@ -25,7 +25,7 @@ public:
     MainWidget(QWidget *parent = 0);
     ~MainWidget();
 public:
-    bool    m_bStyle;
+    bool    m_bUnitStyle;//单元类型，旧新单元
 private:
     AntiCollisionArea* m_pAntiArea;
     ControlWidget*     m_pCtrlWidget;

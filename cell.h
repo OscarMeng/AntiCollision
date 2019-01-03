@@ -70,7 +70,7 @@ private:
     int          m_nCurrentCenSlice;    //当前中心轴展开的弧度片，rad*100，相对于x轴正方向
     int          m_nCurrentEccSlice;    //当前偏心轴展开的弧度片，rad*100，相对于中心轴负方向
     int          m_nWavePos;            //轴波形位置
-    bool         m_bRunStyle;           //运行方式，一般运行，处理运行
+    int          m_nRunStyle;           //运行方式，一般运行，处理运行，结果运行
 public:
     void    InitCell(Pan* pPan, double dRadius, double dRadian);
     QRect   CalRect(double dX,double dY,double dR);
@@ -91,7 +91,7 @@ public:
     inline void SetPainter(QPainter* pPainter)      {m_pPainter = pPainter;}
     inline void SetCurrentCenSlice(int nSlice)      {m_nCurrentCenSlice=nSlice;}
     inline void SetCurrentEccSlice(int nSlice)      {m_nCurrentEccSlice=nSlice;}
-    inline void SetRunStyle(bool bStyle)            {m_bRunStyle=bStyle;}
+    inline void SetRunStyle(int nStyle)             {m_nRunStyle=nStyle;}
     inline int  GetCurrentCenSlice()                {return m_nCurrentCenSlice;}
     inline int  GetCurrentEccSlice()                {return m_nCurrentEccSlice;}
     inline int  GetCenRadSlice()                    {return m_nCenRadSlice;}
