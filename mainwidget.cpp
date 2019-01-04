@@ -11,8 +11,14 @@ MainWidget::MainWidget(QWidget *parent)
     m_pCtrlWidget=new ControlWidget(m_pAntiArea->m_pPaintArea->m_pPan);
     m_pShapeWidget=new ShapeWidget(m_pAntiArea->m_pPaintArea,m_pAntiArea->m_pPaintArea->m_pPan);
 
-    m_pNewControl=new NewControl(m_pAntiArea->m_pPaintArea->m_pNewPan);
-    m_pNewShape=new NewShape(m_pAntiArea->m_pPaintArea,m_pAntiArea->m_pPaintArea->m_pNewPan);
+    m_pNewAnti=new NewAntiArea(m_pNewControl,m_pNewShape);
+    m_pNewControl=new NewControl(m_pNewAnti->m_pNewPaint->m_pNewPan);
+    m_pNewShape=new NewShape(m_pNewAnti->m_pNewPaint,m_pNewAnti->m_pNewPaint->m_pNewPan);
+
+    m_pAntiStack=new QStackedWidget(this);
+    m_pAntiStack->setFrameStyle(QFrame::Panel|QFrame::Raised);
+    m_pAntiStack->addWidget(m_pAntiArea);
+    m_pAntiStack->addWidget(m_pNewAnti);
     m_pControlStack=new QStackedWidget(this);
     m_pControlStack->setFrameStyle(QFrame::Panel|QFrame::Raised);
     m_pControlStack->addWidget(m_pCtrlWidget);
@@ -47,7 +53,7 @@ MainWidget::MainWidget(QWidget *parent)
     mainLayout->setMargin(2);
     mainLayout->setSpacing(5);
     mainLayout->addWidget(m_pMenuBar,0,0,1,1);
-    mainLayout->addWidget(m_pAntiArea,1,0,2,1);
+    mainLayout->addWidget(m_pAntiStack,1,0,2,1);
     mainLayout->addWidget(m_pControlStack,0,1,2,1);
     mainLayout->addWidget(m_pShapeStack,2,1,1,1);
     mainLayout->setRowStretch(1,1);
@@ -65,6 +71,7 @@ void MainWidget::SetOldUnit()
 {
     setWindowTitle(tr("LAMOST碰撞处理"));
     m_bUnitStyle=true;
+    m_pAntiStack->setCurrentIndex(0);
     m_pControlStack->setCurrentIndex(0);
     m_pShapeStack->setCurrentIndex(0);
 }
@@ -73,6 +80,7 @@ void MainWidget::SetNewUnit()
 {
     setWindowTitle(tr("LAMOST新单元碰撞处理"));
     m_bUnitStyle=false;
+    m_pAntiStack->setCurrentIndex(1);
     m_pControlStack->setCurrentIndex(1);
     m_pShapeStack->setCurrentIndex(1);
 }

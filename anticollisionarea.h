@@ -13,6 +13,7 @@ class ControlWidget;
 class ShapeWidget;
 class AntiCollisionArea : public QScrollArea
 {
+    Q_OBJECT
 public:
     AntiCollisionArea(ControlWidget *pControl,ShapeWidget *pShape);
 private:

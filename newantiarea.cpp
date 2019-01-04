@@ -1,7 +1,7 @@
-#include "anticollisionarea.h"
+#include "newantiarea.h"
 
-AntiCollisionArea::AntiCollisionArea(ControlWidget *pControl, ShapeWidget *pShape)
-:m_pControl(pControl),m_pShape(pShape)
+NewAntiArea::NewAntiArea(NewControl *pControl, NewShape *pShape)
+:m_pNewControl(pControl),m_pNewShape(pShape)
 {
     viewport()->setPalette(QPalette(Qt:: white));
     viewport()->setAutoFillBackground(true);
@@ -11,24 +11,24 @@ AntiCollisionArea::AntiCollisionArea(ControlWidget *pControl, ShapeWidget *pShap
     m_nBarWidth=20;
     int width=this->width()-m_nBarWidth;
     int height=this->height()-m_nBarWidth;
-    m_pPaintArea=new PaintArea(this,width,height);//scroll窗口在上面，widget画图窗口在下面
-    setWidget(m_pPaintArea);
+    m_pNewPaint=new NewPaint(this,width,height);//scroll窗口在上面，widget画图窗口在下面
+    setWidget(m_pNewPaint);
 }
 
-AntiCollisionArea::~AntiCollisionArea()
+NewAntiArea::~NewAntiArea()
 {
 
 }
 
-void AntiCollisionArea::resizeEvent(QResizeEvent *)
+void NewAntiArea::resizeEvent(QResizeEvent *)
 {
     int width=this->width()-m_nBarWidth;
     int height=this->height()-m_nBarWidth;
-    m_pPaintArea->resize(width,height);//scroll窗体改变的时候，paint窗体也要改变
-    m_pPaintArea->m_pPan->SetCellCenter(width/2,height/2);//scroll窗体改变，以中心点为0点，中心的位置也在改变
+    m_pNewPaint->resize(width,height);//scroll窗体改变的时候，paint窗体也要改变
+    m_pNewPaint->m_pNewPan->SetCellCenter(width/2,height/2);//scroll窗体改变，以中心点为0点，中心的位置也在改变
 }
 
-void AntiCollisionArea::SetWheelScroll(int nW, int nH, QPoint ptOrg, QPoint ptNew)
+void NewAntiArea::SetWheelScroll(int nW, int nH, QPoint ptOrg, QPoint ptNew)
 {
     int nHMax=horizontalScrollBar()->maximum();
     int nVMax=verticalScrollBar()->maximum();
@@ -39,14 +39,14 @@ void AntiCollisionArea::SetWheelScroll(int nW, int nH, QPoint ptOrg, QPoint ptNe
     SetScrollBarPos(nHScroll,nVScroll);
 }
 
-void AntiCollisionArea::SetMidBtnMove(int nMoveX, int nMoveY)
+void NewAntiArea::SetMidBtnMove(int nMoveX, int nMoveY)
 {
     int nHValue=horizontalScrollBar()->value()+nMoveX;
     int nVValue=verticalScrollBar()->value()+nMoveY;
     SetScrollBarPos(nHValue,nVValue);
 }
 
-void AntiCollisionArea::SetScrollBarPos(int nHScroll, int nVScroll)
+void NewAntiArea::SetScrollBarPos(int nHScroll, int nVScroll)
 {
     horizontalScrollBar()->valueChanged(nHScroll);
     horizontalScrollBar()->setSliderPosition(nHScroll);  //setValue()对水平滑动条的新位置进行设置
@@ -55,5 +55,3 @@ void AntiCollisionArea::SetScrollBarPos(int nHScroll, int nVScroll)
     horizontalScrollBar()->update();
     verticalScrollBar()->update();
 }
-
-

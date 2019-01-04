@@ -12,7 +12,7 @@ ShapeWidget::ShapeWidget(PaintArea *pPaintArea,Pan *pPan) : m_pPaintArea(pPaintA
     m_pCellIDEdit=new QLineEdit;
     m_pCenBtn=new QPushButton(tr("中心轴"));
     m_pEccBtn=new QPushButton(tr("偏心轴"));
-    m_pAxis=new AxisWidget(this);
+    m_pAxis=new AxisWidget();
     m_pTextEdit=new QTextEdit;
 
     m_pCellLayout=new QHBoxLayout();
@@ -72,7 +72,7 @@ void ShapeWidget::PressCenBtn()
     QString sID=m_pCellIDEdit->text().trimmed();
     bool b;
     int nID=sID.toInt(&b);
-    if(nID>0&&nID<CELL_NUM)
+    if(nID>0&&nID<=CELL_NUM)
     {
         QString sc="";
         for(int i=1;i<=WAVE_NUM;i++)
@@ -94,7 +94,7 @@ void ShapeWidget::PressEccBtn()
     QString sID=m_pCellIDEdit->text().trimmed();
     bool b;
     int nID=sID.toInt(&b);
-    if(nID>0&&nID<CELL_NUM)
+    if(nID>0&&nID<=CELL_NUM)
     {
         QString se="";
         for(int i=1;i<=WAVE_NUM;i++)

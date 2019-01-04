@@ -25,14 +25,13 @@ signals:
     void Path(QString);
     void Progress();
 public slots:
-//    void OpenFile();
-//    void ReadPath();
-//    void ChangeText();
-//    void SetTextEdit(QString s);
-//    void ClearText();
-//    void SetProgressBar();
-
-public:
+    void OpenFile();
+    void ReadPath();
+    void ChangeText();
+    void ReceiveCollision(int nID, int mID);
+    void SetTextEdit(QString sTemp);
+    void ClearText();
+    void SetProgressBar();
 
 private:
     QLabel      *m_pFilePath;
@@ -40,8 +39,10 @@ private:
     QPushButton *m_pOpen;
     QPushButton *m_pRead;
     QPushButton *m_pCheckBtn;
+    QPushButton *m_pRandomBtn;
     QPushButton *m_pRunBtn;
     QPushButton *m_pPause;
+    QPushButton *m_pStop;
     QPushButton *m_pResetBtn;
     QTextEdit   *m_pShowText;
     QPushButton *m_pCalculateBtn;

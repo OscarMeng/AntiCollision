@@ -1,6 +1,6 @@
 #include "axiswidget.h"
 
-AxisWidget::AxisWidget(ShapeWidget *pShape):m_pShape(pShape)
+AxisWidget::AxisWidget()
 {
     QPalette bgpal = palette();
     bgpal.setColor(QPalette::Background, QColor (170, 230 , 200));
@@ -15,7 +15,6 @@ AxisWidget::AxisWidget(ShapeWidget *pShape):m_pShape(pShape)
     m_bCenEcc=true;
     m_sData="";
     m_sTitle="";
-
 }
 
 AxisWidget::~AxisWidget()

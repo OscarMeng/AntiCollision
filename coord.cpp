@@ -2,7 +2,6 @@
 
 Coord::Coord(QObject *parent) : QObject(parent)
 {
-    m_nCellNum = 0;
     m_nRowNum[0] = m_nRowNum[18] = 4;
     m_nRowNum[1] = m_nRowNum[17] = 9;
     m_nRowNum[2] = m_nRowNum[16] = 10;
@@ -14,7 +13,6 @@ Coord::Coord(QObject *parent) : QObject(parent)
     m_nRowNum[8] = m_nRowNum[10] = 16;
     m_nRowNum[9] = 17;
 
-    m_nNewNum=0;
     m_nNewRow[0]=m_nNewRow[20]=7;
     m_nNewRow[1]=m_nNewRow[19]=10;
     m_nNewRow[2]=m_nNewRow[18]=13;
@@ -25,7 +23,17 @@ Coord::Coord(QObject *parent) : QObject(parent)
     m_nNewRow[7]=m_nNewRow[13]=18;
     m_nNewRow[8]=m_nNewRow[12]=19;
     m_nNewRow[9]=m_nNewRow[11]=18;
-    m_nNewRow[10]=18;
+    m_nNewRow[10]=19;
+    for(int i=0;i<CELL_NUM;i++)
+    {
+        m_dCoord[i][0]=0;
+        m_dCoord[i][1]=0;
+    }
+    for(int j=0;j<NEW_NUM;j++)
+    {
+        m_dNewCoord[j][0]=0;
+        m_dNewCoord[j][1]=0;
+    }
     CalCoord();
     CalNewCoord();
 }
@@ -33,7 +41,8 @@ Coord::Coord(QObject *parent) : QObject(parent)
 void Coord::CalCoord()
 {
     double dV = CELL_SPACE*sin(PI / 3);
-    double dH = CELL_SPACE / 2;
+    double dH = CELL_SPACE/2.0;
+    int nCellNum=0;
 
     //整个图形中心点为（0，0)
     //共19行,顺序编号m_nCellNum++
@@ -54,9 +63,9 @@ void Coord::CalCoord()
                 || ((int)dx == (int)dH && (int)dy == -(int)dV)
                 ))
             {
-                m_dCoord[m_nCellNum][0] = dx;
-                m_dCoord[m_nCellNum][1] = dy;
-                m_nCellNum++;
+                m_dCoord[nCellNum][0] = dx;
+                m_dCoord[nCellNum][1] = dy;
+                nCellNum++;
             }
         }
     }
@@ -65,19 +74,20 @@ void Coord::CalCoord()
 void Coord::CalNewCoord()
 {
     double dV = NEW_SPACE*sin(PI / 3);
-    double dH = NEW_SPACE / 2;
+    double dH = NEW_SPACE/2.0;
+    int nNewNum=0;
 
     //整个图形中心点为（0，0)
     //共21行,顺序编号m_nNewNum++
-    for (int i = 0; i < NEW_ROW;++i)
+    for (int i = 0; i < NEW_ROW;i++)
     {
-        for (int j = 0; j < m_nRowNum[i];++j)
+        for (int j = 0; j < m_nNewRow[i];j++)
         {
             double dx = 2 * j * dH - (m_nNewRow[i]-1) * dH;
             double dy = i * dV - 10 * dV;
-            m_dNewCoord[m_nNewNum][0] = dx;
-            m_dNewCoord[m_nNewNum][1] = dy;
-            m_nNewNum++;
+            m_dNewCoord[nNewNum][0] = dx;
+            m_dNewCoord[nNewNum][1] = dy;
+            nNewNum++;
         }
     }
 }

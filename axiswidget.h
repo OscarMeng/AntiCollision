@@ -6,14 +6,12 @@
 #include <QLabel>
 #include <QStringList>
 #include "mymethod.h"
-#include "shapewidget.h"
 
-class ShapeWidget;
 class AxisWidget: public QWidget
 {
     Q_OBJECT
 public:
-    AxisWidget(ShapeWidget *pShape);
+    AxisWidget();
 public:
     virtual ~AxisWidget();
 public:
@@ -24,7 +22,6 @@ public:
     int    m_nOffset;        //偏移量
 public:
     QPainter    *m_pPainter;
-    ShapeWidget *m_pShape;
 public:
     QPoint       m_ptYStart;//出现问题不能用,问题是编译文件有问题,重新删除编译
     QPoint       m_ptYEnd;

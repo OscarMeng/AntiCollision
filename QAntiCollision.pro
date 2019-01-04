@@ -25,7 +25,9 @@ SOURCES += main.cpp \
     axiswidget.cpp \
     newcontrol.cpp \
     newpan.cpp \
-    newcell.cpp
+    newcell.cpp \
+    newantiarea.cpp \
+    newpaint.cpp
 
 HEADERS  += \
     mainwidget.h \
@@ -41,6 +43,8 @@ HEADERS  += \
     axiswidget.h \
     newcontrol.h \
     newpan.h \
-    newcell.h
+    newcell.h \
+    newantiarea.h \
+    newpaint.h
 
 DISTFILES +=

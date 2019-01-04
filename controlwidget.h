@@ -33,8 +33,6 @@ public slots:
     void ClearText();
     void SetProgressBar();
 
-public:
-
 private:
     QLabel      *m_pFilePath;
     QLineEdit   *m_pLineText;

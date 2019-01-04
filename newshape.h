@@ -10,21 +10,21 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include "newpan.h"
-#include "paintarea.h"
+#include "newpaint.h"
 #include "axiswidget.h"
 
 class NewPan;
-class PaintArea;
+class NewPaint;
 class AxisWidget;
 class NewShape : public QWidget
 {
     Q_OBJECT
 public:
-    explicit NewShape(PaintArea *pPaintArea, NewPan* pNewPan);
+    explicit NewShape(NewPaint *pPaint, NewPan* pPan);
 private:
     virtual ~NewShape();
 public:
-    PaintArea   *m_pPaintArea;
+    NewPaint    *m_pNewPaint;
     NewPan      *m_pNewPan;
     QLabel      *m_pCellLabel;
     QLineEdit   *m_pCellIDEdit;

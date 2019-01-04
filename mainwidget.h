@@ -13,11 +13,14 @@
 #include "anticollisionarea.h"
 #include "controlwidget.h"
 #include "shapewidget.h"
+#include "pan.h"
+#include "newantiarea.h"
 #include "newcontrol.h"
 #include "newshape.h"
-#include "pan.h"
+#include "newpan.h"
 
 class Pan;
+class NewPan;
 class MainWidget : public QWidget
 {
     Q_OBJECT
@@ -30,7 +33,7 @@ private:
     AntiCollisionArea* m_pAntiArea;
     ControlWidget*     m_pCtrlWidget;
     ShapeWidget*       m_pShapeWidget;
-
+    NewAntiArea*       m_pNewAnti;
     NewControl*        m_pNewControl;
     NewShape*          m_pNewShape;
     QMenu*             m_pCellType;
@@ -39,8 +42,9 @@ private:
     QAction*           m_pNewAct;
     QAction*           m_pPosAct;
     QMenuBar*          m_pMenuBar;
-    QStackedWidget*    m_pShapeStack;
+    QStackedWidget*    m_pAntiStack;
     QStackedWidget*    m_pControlStack;
+    QStackedWidget*    m_pShapeStack;
 signals:
 
 public slots:

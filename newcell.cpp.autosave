@@ -15,25 +15,10 @@ NewCell::NewCell(int nID, bool bStatus, double dCenterX, double dCenterY)
     m_nWavePos=0;
     m_nRunStyle=RUN_COM;//一般运行方式
     m_dREcc=MAX_RADIUS; //偏心轴半径最大
-    m_ptCenP1=QPointF(-2.75,-3.9);
-    m_ptCenP2=QPointF(-2.75,-6.9);
-    m_ptCenP3=QPointF(10.25,-6.9);
-    m_ptCenP4=QPointF(10.25,-3.9);
-    m_ptEccP1=QPointF(0,0);
-    m_ptEccP2=QPointF(0,0);
-    m_ptEccP3=QPointF(0,0);
-    m_ptEccP4=QPointF(0,0);
-    m_ptEccR1=QPointF(0,0);
-    m_ptEccR2=QPointF(0,0);
-    m_ptEccR3=QPointF(0,0);
-    m_dLenghtP1=LengthByPoint(m_ptCenP1);
-    m_dLenghtP2=LengthByPoint(m_ptCenP2);
-    m_dLenghtP3=LengthByPoint(m_ptCenP3);
-    m_dLenghtP4=LengthByPoint(m_ptCenP4);
-    m_dRadianP1=atan(m_ptCenP1.y()/m_ptCenP1.x())+PI;
-    m_dRadianP2=atan(m_ptCenP2.y()/m_ptCenP2.x())+PI;
-    m_dRadianP3=atan(m_ptCenP3.y()/m_ptCenP3.x())+2*PI;
-    m_dRadianP4=atan(m_ptCenP4.y()/m_ptCenP4.x())+2*PI;
+
+    m_ptEccR1=QPointF(-16.0,0.0);
+    m_ptEccR2=QPointF(14.5,0.0);
+
     for(int i=0;i<WAVE_NUM;i++)
     {
         m_nCenWave[i]=BYTE_NULL;
@@ -51,21 +36,21 @@ void NewCell::InitCell(NewPan *pPan, double dRadius, double dRadian)
 {
     m_pNewPan = pPan;
     m_dRunRadian = dRadian;
-    if(dRadius<=0)
+    if(dRadius<=16)
     {
-        m_dRadius =0;
+        m_dRadius =16;
         m_dStartRadian=acos(0);
     }
-    else if(dRadius>=2*m_dRunEcc)
+    else if(dRadius>=45)
     {
-        m_dRadius=2*m_dRunEcc;
+        m_dRadius=45;
         m_dStartRadian=acos(1);
     }
     else
     {
         m_dRadius = dRadius;
-        m_dStartRadian = acos((m_dRadius*m_dRadius + m_dRunEcc*m_dRunEcc - m_dRunEcc*m_dRunEcc)
-                              /(2 * m_dRadius*m_dRunEcc));//三角形余弦定理
+        m_dStartRadian = acos((m_dRadius*m_dRadius + m_dCen*m_dCen - m_dEcc*m_dEcc)
+                              /(2*m_dRadius*m_dCen));//三角形余弦定理
     }
     //运行的单元，保证弧度大于0
     if(m_bStatus)
@@ -152,11 +137,9 @@ void NewCell::DrawCenEcc()
     m_pPainter->setPen(*(m_pNewPan->m_pDddPen[COLOR_COORD]));
     m_pPainter->drawLine(m_pNewPan->Op2Vp(m_dCenterX,m_dCenterY),m_pNewPan->Op2Vp(m_ptEccR2));
     m_pPainter->drawLine(m_pNewPan->Op2Vp(m_ptEccR2),m_pNewPan->Op2Vp(m_ptEccR1));
-
-    //中心轴外形    偏心轴外形
+    //偏心轴外形
     m_pPainter->setPen(*(m_pNewPan->m_pSolidPen[COLOR_SHAFT]));
-    m_pPainter->drawPath(m_pathCen);
-    m_pPainter->drawPath(m_pathEcc);
+    m_pPainter->drawPath(m_path);
 }
 
 void NewCell::DrawUnexpanded()
@@ -165,10 +148,9 @@ void NewCell::DrawUnexpanded()
     m_pPainter->setPen(*(m_pNewPan->m_pDddPen[COLOR_DISUSE]));
     m_pPainter->drawLine(m_pNewPan->Op2Vp(m_dCenterX,m_dCenterY),m_pNewPan->Op2Vp(m_ptEccR2));
     m_pPainter->drawLine(m_pNewPan->Op2Vp(m_ptEccR2),m_pNewPan->Op2Vp(m_ptEccR1));
-    //中心轴外形    偏心轴外形
+    //偏心轴外形
     m_pPainter->setPen(*(m_pNewPan->m_pSolidPen[COLOR_DISUSE]));
-    m_pPainter->drawPath(m_pathCen);
-    m_pPainter->drawPath(m_pathEcc);
+    m_pPainter->drawPath(m_path);
 }
 
 void NewCell::DrawTargetPos()
@@ -227,9 +209,10 @@ QPointF NewCell::CalPointBySlice(int nCenSlice, int nEccSlice)
     double dCenRadian=double(nCenSlice)/SLICE_RATIO;
     double dEccRadian=double(nEccSlice)/SLICE_RATIO;
     //在偏心轴展开组成的三角形中，求展开半径，半径展开弧度
-    double dRadius=sqrt(m_dRunEcc*m_dRunEcc+m_dRunEcc*m_dRunEcc
-                 -2*m_dRunEcc*m_dRunEcc*cos(dEccRadian));
-    double dSpreadRadian=(PI-dEccRadian)/2.0;
+    double dRadius=sqrt(m_dCen*m_dCen+m_dEcc*m_dEcc
+                 -2*m_dCen*m_dEcc*cos(dEccRadian));
+    double dSpreadRadian=acos((dRadius*dRadius + m_dCen*m_dCen - m_dEcc*m_dEcc)
+                              /(2*dRadius*m_dCen));//三角形余弦定理
     return QPointF(m_dCenterX+dRadius*cos(dCenRadian+dSpreadRadian),
                    m_dCenterY-dRadius*sin(dCenRadian+dSpreadRadian));
 }
@@ -241,23 +224,12 @@ void NewCell::CreatePoint()
     {
         CalCurrentRadSlice();
     }
-    //中心轴外形矩形4点
     //中心轴转动的弧度
     double dCenRadian=double(m_nCurrentCenSlice)/SLICE_RATIO;
-    double dPA1=dCenRadian+m_dRadianP1;
-    double dPA2=dCenRadian+m_dRadianP2;
-    double dPA3=dCenRadian+m_dRadianP3;
-    double dPA4=dCenRadian+m_dRadianP4;
-    m_ptCenP1=QPointF(m_dCenterX+m_dLenghtP1*cos(dPA1),m_dCenterY-m_dLenghtP1*sin(dPA1));
-    m_ptCenP2=QPointF(m_dCenterX+m_dLenghtP2*cos(dPA2),m_dCenterY-m_dLenghtP2*sin(dPA2));
-    m_ptCenP3=QPointF(m_dCenterX+m_dLenghtP3*cos(dPA3),m_dCenterY-m_dLenghtP3*sin(dPA3));
-    m_ptCenP4=QPointF(m_dCenterX+m_dLenghtP4*cos(dPA4),m_dCenterY-m_dLenghtP4*sin(dPA4));
-
     //偏心轴外形矩形4点，中心3点
-    double dCenDistance=m_dEcc-2*m_dREcc-m_dRunEcc;
     m_ptEccR1=CalPointBySlice(m_nCurrentCenSlice,m_nCurrentEccSlice);
-    m_ptEccR2=QPointF(m_dCenterX+m_dRunEcc*cos(dCenRadian),
-                      m_dCenterY-m_dRunEcc*sin(dCenRadian));
+    m_ptEccR2=QPointF(m_dCenterX+m_dEcc*cos(dCenRadian),
+                      m_dCenterY-m_dEcc*sin(dCenRadian));
     double dEccFabsRadian=asin(fabs(m_ptEccR2.y()-m_ptEccR1.y())
                                /LengthByPoint(m_ptEccR1,m_ptEccR2));
     double dEccRadian=0;//偏心轴在视图坐标中的弧度
@@ -284,29 +256,11 @@ void NewCell::CreatePoint()
     }
     double dChamferRadian=dEccRadian-PI/2.0;
     m_dChamferDegree=dChamferRadian/PI*180.0;
-    m_ptEccR3=QPointF(m_ptEccR2.x()-dCenDistance*cos(dEccRadian),
-                      m_ptEccR2.y()+dCenDistance*sin(dEccRadian));
-    m_ptEccP1=QPointF(m_ptEccR1.x()-m_dREcc*cos(dChamferRadian),
-                      m_ptEccR1.y()+m_dREcc*sin(dChamferRadian));
-    m_ptEccP2=QPointF(m_ptEccR1.x()+m_dREcc*cos(dChamferRadian),
-                      m_ptEccR1.y()-m_dREcc*sin(dChamferRadian));
-    m_ptEccP3=QPointF(m_ptEccR3.x()+m_dREcc*cos(dChamferRadian),
-                      m_ptEccR3.y()-m_dREcc*sin(dChamferRadian));
-    m_ptEccP4=QPointF(m_ptEccR3.x()-m_dREcc*cos(dChamferRadian),
-                      m_ptEccR3.y()+m_dREcc*sin(dChamferRadian));
 }
 
 void NewCell::CreatePath()
 {
     CreatePoint();
-    //中心轴外形
-    QPainterPath cenPath;
-    cenPath.moveTo(m_pNewPan->Op2Vp(m_ptCenP1));
-    cenPath.lineTo(m_pNewPan->Op2Vp(m_ptCenP2));
-    cenPath.lineTo(m_pNewPan->Op2Vp(m_ptCenP3));
-    cenPath.lineTo(m_pNewPan->Op2Vp(m_ptCenP4));
-    cenPath.closeSubpath();
-    m_pathCen=cenPath;
     //偏心轴外形
     QPainterPath eccPath;
     //方向为P2,P1,P4,P3
