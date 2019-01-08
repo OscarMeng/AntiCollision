@@ -24,7 +24,7 @@ public:
 private:
     const double m_dCen = 13;      //中心轴长度
     const double m_dEcc = 13.5;    //偏心轴长度
-    const double m_dRunEcc = 8.5;  //偏心轴展开长度
+    const double m_dRunEcc = 8.25; //偏心轴展开长度
     double m_dREcc;                //偏心轴外倒角圆弧半径
 
     QPointF m_ptCenP1;             //中心轴起始时4点

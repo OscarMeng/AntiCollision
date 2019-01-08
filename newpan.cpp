@@ -18,7 +18,7 @@ NewPan::NewPan(NewPaint *pPaint, int nCenterX, int nCenterY):m_pNewPaint(pPaint)
     m_pNewControl=m_pNewPaint->m_pNewAnti->m_pNewControl;
     m_pNewShape=m_pNewPaint->m_pNewAnti->m_pNewShape;
     m_sFilePath="/QAntiCollision/File/NewUnit/CheckCenter.txt";
-    m_dZoom = ORIGNAL_ZOOM;//2D·Å´ó
+    m_dZoom = ORIGNAL_ZOOM;//åŸå§‹æ”¾å¤§å€æ•°
     m_pCoord = new Coord;
     InitPan();
 }
@@ -75,12 +75,12 @@ void NewPan::ReadDataFile()
         while(!fp.atEnd())
         {
             QString strLine=QString(fp.readLine()).trimmed();
-            QStringList strList=strLine.split(QRegExp("\\s{1,}"));//°ÑËùÓĞµÄ¶àÓàµÄ¿Õ¸ñÎª¼ä¸ô,ÕıÔò±í´ïÊ½QRegExp("[\\s]+")
+            QStringList strList=strLine.split(QRegExp("\\s{1,}"));//æŠŠæ‰€æœ‰çš„å¤šä½™çš„ç©ºæ ¼ä¸ºé—´éš”,æ­£åˆ™è¡¨è¾¾å¼QRegExp("[\\s]+")
             bool b;
             m_nRunID[i]=strList[0].toInt(&b);
             m_dRunRadius[i]=strList[1].toDouble(&b);
             double dA=strList[2].toDouble(&b);
-            m_dRunRadian[i]=dA/180.0*PI;//°Ñ¶ÈÊı×ª»¯Îª»¡¶È£¬¶ÈÊı¿É¶ÁĞÔºÃ£¬»¡¶È¼ÆËã·½±ã
+            m_dRunRadian[i]=dA/180.0*PI;//æŠŠåº¦æ•°è½¬åŒ–ä¸ºå¼§åº¦ï¼Œåº¦æ•°å¯è¯»æ€§å¥½ï¼Œå¼§åº¦è®¡ç®—æ–¹ä¾¿
             i++;
         }
         m_nRunNum = i;
@@ -94,15 +94,15 @@ QColor NewPan::GetDefinedColor(int n)
     QColor col;
     switch (n)
     {
-    case COLOR_NUM:	    col = QColor(255, 255, 255);	break;//°×É«µ¥ÔªºÅÑÕÉ«
-    case COLOR_BREAK:	col = QColor(255, 0, 0);		break;//ºìÉ«µ¥ÔªÅö×²ÇøÓòÑÕÉ«
-    case COLOR_RUN:	    col = QColor(0, 225, 0);	    break;//ÂÌÉ«µ¥ÔªÔËĞĞ¹ıµÄÂ·¾¶ÑÕÉ«
-    case COLOR_COORD:	col = QColor(180, 0, 0);        break;//Ç³ºìÉ«×ø±êÖáÑÕÉ«
-    case COLOR_DISUSE:	col = QColor(50, 50, 50);	    break;//Ç³»ÒÉ«²»Õ¹¿ªµ¥ÔªÖáÍâĞÎ
-    case COLOR_CIRCLE:	col = QColor(80, 80, 80);       break;//Ç³»ÒÉ«µ¥ÔªÕ¹¿ª×îÍâÔ²
-    case COLOR_TARGET:	col = QColor(245, 255, 110);	break;//Ç³»ÆÉ«Ä¿±êµã
-    case COLOR_BORDER:	col = QColor(0, 0, 255);    	break;//À¶É«±ß½ç
-    case COLOR_SHAFT:   col = QColor(235,170,255);      break;//Ç³×ÏÉ«ÔËĞĞÖáÍâĞÎ
+    case COLOR_NUM:	    col = QColor(255, 255, 255);	break;//ç™½è‰²å•å…ƒå·é¢œè‰²
+    case COLOR_BREAK:	col = QColor(255, 0, 0);		break;//çº¢è‰²å•å…ƒç¢°æ’åŒºåŸŸé¢œè‰²
+    case COLOR_RUN:	    col = QColor(0, 225, 0);	    break;//ç»¿è‰²å•å…ƒè¿è¡Œè¿‡çš„è·¯å¾„é¢œè‰²
+    case COLOR_COORD:	col = QColor(180, 0, 0);        break;//æµ…çº¢è‰²åæ ‡è½´é¢œè‰²
+    case COLOR_DISUSE:	col = QColor(50, 50, 50);	    break;//æµ…ç°è‰²ä¸å±•å¼€å•å…ƒè½´å¤–å½¢
+    case COLOR_CIRCLE:	col = QColor(80, 80, 80);       break;//æµ…ç°è‰²å•å…ƒå±•å¼€æœ€å¤–åœ†
+    case COLOR_TARGET:	col = QColor(245, 255, 110);	break;//æµ…é»„è‰²ç›®æ ‡ç‚¹
+    case COLOR_BORDER:	col = QColor(0, 0, 255);    	break;//è“è‰²è¾¹ç•Œ
+    case COLOR_SHAFT:   col = QColor(235,170,255);      break;//æµ…ç´«è‰²è¿è¡Œè½´å¤–å½¢
 
     default:			col = QColor(192, 192, 192);
     }
@@ -224,14 +224,14 @@ QRect NewPan::Radius2Rect(double dx, double dy, double dR)
 
     QPoint leftTop = Op2Vp(left, top);
     QPoint rightBottom = Op2Vp(right, bottom);
-    //¾ØĞÎ£¬ÆğÊ¼µã£¬¿íºÍ¸ß
+    //çŸ©å½¢ï¼Œèµ·å§‹ç‚¹ï¼Œå®½å’Œé«˜
     return QRect(leftTop.x(),leftTop.y(),
                  rightBottom.x()-leftTop.x(),rightBottom.y()-leftTop.y());
 }
 
 void NewPan::Draw()
 {
-    //²»ÔËĞĞ£¬²»´¦Àí£¬ÇøÓò·Å´óÒÆ¶¯Ê±£¬´´½¨µ¥Ôª
+    //ä¸è¿è¡Œï¼Œä¸å¤„ç†ï¼ŒåŒºåŸŸæ”¾å¤§ç§»åŠ¨æ—¶ï¼Œåˆ›å»ºå•å…ƒ
     if(!m_bRunStatus)
     {
         for (int i = 1; i <= NEW_NUM;i++)
@@ -240,20 +240,20 @@ void NewPan::Draw()
         }
         CheckIntersects();
     }
-    //»­µ¥Ôª,ÔËĞĞÊ±ÒÑ¾­Éú³Éµ¥ÔªÂÖÀª¹ì¼£
+    //ç”»å•å…ƒ,è¿è¡Œæ—¶å·²ç»ç”Ÿæˆå•å…ƒè½®å»“è½¨è¿¹
     for(int i=0;i<NEW_NUM;i++)
     {
-        m_pNewCell[i]->SetPainter(m_pPainter);//Ö»ÄÜÔÚ»­Ö®Ç°ÉèÖÃ
+        m_pNewCell[i]->SetPainter(m_pPainter);//åªèƒ½åœ¨ç”»ä¹‹å‰è®¾ç½®
         m_pNewCell[i]->Draw();
     }
-    //»­ÖĞĞÄÔ²£¬ÍâÔ²
+    //ç”»ä¸­å¿ƒåœ†ï¼Œå¤–åœ†
     m_pPainter->setPen(*m_pSolidPen[COLOR_BORDER]);
     m_pPainter->drawEllipse(Radius2Rect(0,0,m_dRPan));
-    //»­ÖĞĞÄÖáÏß
+    //ç”»ä¸­å¿ƒè½´çº¿
     m_pPainter->setPen(*m_pDddPen[COLOR_COORD]);
     m_pPainter->drawLine(Op2Vp(0,m_dRPan+20.0),Op2Vp(0,-m_dRPan-20.0));
     m_pPainter->drawLine(Op2Vp(m_dRPan+20.0,0),Op2Vp(-m_dRPan-20.0,0));
-    //»­Åö×²ÇøÓò
+    //ç”»ç¢°æ’åŒºåŸŸ
     m_pPainter->setPen(*m_pSolidPen[COLOR_BORDER]);
     for(int i=0;i<m_nPathIndex;i++)
     {
@@ -341,14 +341,9 @@ int NewPan::CellEccFinalPos(int nID)
     return nPos;
 }
 
-QPainterPath NewPan::CellCenPath(int nID)
+QPainterPath NewPan::CellPath(int nID)
 {
-    return m_pNewCell[nID-1]->GetCenPath();
-}
-
-QPainterPath NewPan::CellEccPath(int nID)
-{
-    return m_pNewCell[nID-1]->GetEccPath();
+    return m_pNewCell[nID-1]->GetPath();
 }
 
 void NewPan::SetCellWavePos(int nID, int nPos)
@@ -371,17 +366,11 @@ void NewPan::SetCellEccSlice(int nID, int nSlice)
     m_pNewCell[nID-1]->SetCurrentEccSlice(nSlice);
 }
 
-void NewPan::SetCellEccRadius(int nID, double dRadius)
-{
-    m_pNewCell[nID-1]->SetEccRadius(dRadius);
-}
-
-void NewPan::SetCellFinalValue(int nID,int nStyle,double dEccR)
+void NewPan::SetCellFinalValue(int nID,int nStyle)
 {
     SetCellCenSlice(nID,CenTargetSlice(nID));
     SetCellEccSlice(nID,EccTargetSlice(nID));
     SetCellRunStyle(nID,nStyle);
-    SetCellEccRadius(nID,dEccR);
 }
 
 int NewPan::CellCenPosValue(int nID, int nPos)
@@ -412,30 +401,26 @@ void NewPan::PlayRun()
     case 0:
         m_nSliceIndex++;
         m_nPlayIndex++;
-        m_bRunEnd=true;//Ã¿´Î¶¼½øĞĞ¼ÙÉèÔËĞĞÍê³É
-        break;
+        m_bRunEnd=true;//æ¯æ¬¡éƒ½è¿›è¡Œå‡è®¾è¿è¡Œå®Œæˆ
     case 1:
         RunCellValue();
         m_nPlayIndex++;
-        break;
     case 2:
         if(m_bRunEnd)
         {
             m_nPlayIndex=0;
             m_bRunStatus=false;
             m_nRunMode=RUN_NULL;
-            emit ShowText("ÔËĞĞÍê³É£¡");
+            emit ShowText("è¿è¡Œå®Œæˆï¼");
             return;
         }
         else
         {
             m_nPlayIndex++;
         }
-        break;
     case 3:
         CheckIntersects();
         m_nPlayIndex++;
-        break;
     case 4:
         if(m_bPause)
         {
@@ -446,7 +431,6 @@ void NewPan::PlayRun()
         {
             m_nPlayIndex++;
         }
-        break;
     case 5:
         if(m_bStop)
         {
@@ -460,7 +444,6 @@ void NewPan::PlayRun()
         {
             m_nPlayIndex++;
         }
-        break;
     case 6:
         m_nPlayIndex=0;
         m_pNewPaint->update();
@@ -486,7 +469,6 @@ void NewPan::PlayDeal()
             {
                 SetCellWavePos(i,m_nPosIndex);
                 SetCellRunStyle(i,RUN_LAST);
-                SetCellEccRadius(i,MIN_RADIUS);
                 CreateCellPath(i);
             }
         }
@@ -496,7 +478,7 @@ void NewPan::PlayDeal()
             m_nPlayIndex=0;
             m_bRunStatus=false;
             m_nRunMode=RUN_NULL;
-            emit ShowText("ÔËĞĞ½áÊø£¡");
+            emit ShowText("è¿è¡Œç»“æŸï¼");
             return;
         }
         m_nPlayIndex++;
@@ -543,16 +525,16 @@ void NewPan::RunCellValue()
 {
     for (int i = 1; i <= NEW_NUM;i++)
     {
-        //ÔËĞĞµÄµ¥Ôª½øĞĞ¸øÖµ
+        //è¿è¡Œçš„å•å…ƒè¿›è¡Œç»™å€¼
         if(CellRunStatus(i))
         {
-            //ÖĞĞÄÖáÏÈÕ¹¿ª
+            //ä¸­å¿ƒè½´å…ˆå±•å¼€
             if(m_nSliceIndex <= CenTargetSlice(i))
             {
                 SetCellCenSlice(i,m_nSliceIndex);
                 m_bRunEnd=false;
             }
-            //ÖĞĞÄÖáÊ£ÓàÕ¹¿ª¶ÈÊıÓëÆ«ĞÄÖá¶ÈÊıÏàÍ¬»òĞ¡ÓÚÊ±£¬Æ«ĞÄÖá¿ªÊ¼Õ¹¿ª
+            //ä¸­å¿ƒè½´å‰©ä½™å±•å¼€åº¦æ•°ä¸åå¿ƒè½´åº¦æ•°ç›¸åŒæˆ–å°äºæ—¶ï¼Œåå¿ƒè½´å¼€å§‹å±•å¼€
             if(CenTargetSlice(i)-m_nSliceIndex<EccTargetSlice(i))
             {
                 if(CenTargetSlice(i)>=EccTargetSlice(i)&&m_nSliceIndex<=CenTargetSlice(i))
@@ -572,44 +554,26 @@ void NewPan::RunCellValue()
             }
         }
         SetCellRunStyle(i,RUN_COM);
-        SetCellEccRadius(i,MAX_RADIUS);
         CreateCellPath(i);
     }
 }
 
 void NewPan::CheckIntersects()
 {
-    //¼ì²â¿ÉÄÜ·¢ÉúÅö×²µÄÁ½¸öµ¥Ôª£¬µ¥ÔªÓëÆäÖÜÎ§µÄµ¥Ôª½øĞĞ¼ì²â
+    //æ£€æµ‹å¯èƒ½å‘ç”Ÿç¢°æ’çš„ä¸¤ä¸ªå•å…ƒï¼Œå•å…ƒä¸å…¶å‘¨å›´çš„å•å…ƒè¿›è¡Œæ£€æµ‹
     m_nPathIndex=0;
     for (int i = 0; i < m_nRunNum;i++)
     {
         for(int j = 1;j <= NEW_NUM;j++)
         {
             int nDistance=CellDistance(m_nRunID[i],j);
-            if(nDistance==INT_SPACE)
+            if(nDistance==NEW_SPACE)
             {
-                QPainterPath path1=m_pNewCell[m_nRunID[i]-1]->GetCenPath();
-                QPainterPath path2=m_pNewCell[m_nRunID[i]-1]->GetEccPath();
-                QPainterPath path3=m_pNewCell[j-1]->GetCenPath();
-                QPainterPath path4=m_pNewCell[j-1]->GetEccPath();
-                bool b1=path1.intersects(path4);
-                bool b2=path2.intersects(path3);
-                bool b3=path2.intersects(path4);
-                if(b1)
+                QPainterPath path1=CellPath(m_nRunID[i]);
+                QPainterPath path2=CellPath(j);
+                if(path1.intersects(path2))
                 {
-                    m_pathInsertects[m_nPathIndex]=path1.intersected(path4);
-                    m_nPathIndex++;
-                    emit SendCollision(m_nRunID[i],j);
-                }
-                if(b2)
-                {
-                    m_pathInsertects[m_nPathIndex]=path2.intersected(path3);
-                    m_nPathIndex++;
-                    emit SendCollision(m_nRunID[i],j);
-                }
-                if(b3)
-                {
-                    m_pathInsertects[m_nPathIndex]=path2.intersected(path4);
+                    m_pathInsertects[m_nPathIndex]=path1.intersected(path2);
                     m_nPathIndex++;
                     emit SendCollision(m_nRunID[i],j);
                 }
@@ -634,7 +598,7 @@ void NewPan::PlaySolution()
             m_nPlayIndex=0;
             m_bRunStatus=false;
             m_nRunMode=RUN_NULL;
-            emit ShowText("´¦Àí³ö´í£¡");
+            emit ShowText("å¤„ç†å‡ºé”™ï¼");
             return;
         }
         m_nPlayIndex++;
@@ -648,7 +612,7 @@ void NewPan::PlaySolution()
             m_nPlayIndex=0;
             m_bRunStatus=false;
             m_nRunMode=RUN_NULL;
-            emit ShowText("´¦ÀíÍê³É£¡");
+            emit ShowText("å¤„ç†å®Œæˆï¼");
             return;
         }
         else
@@ -693,10 +657,10 @@ void NewPan::PlaySolution()
 
 void NewPan::DealCellPos()
 {
-    //Î»ÖÃÏòÇ°1£¬Î»ÖÃÔİÍ£0£¬È»ºó½øĞĞÅö×²ÅĞ¶Ï
+    //ä½ç½®å‘å‰1ï¼Œä½ç½®æš‚åœ0ï¼Œç„¶åè¿›è¡Œç¢°æ’åˆ¤æ–­
     for(int i=1;i<=NEW_NUM;i++)
     {
-        //ÔËĞĞµÄµ¥Ôª,½øĞĞ²¨ĞÎÎ»ÖÃÖµ´¦Àí
+        //è¿è¡Œçš„å•å…ƒ,è¿›è¡Œæ³¢å½¢ä½ç½®å€¼å¤„ç†
         if(CellRunStatus(i))
         {
             if(CenTargetSlice(i)>CalCenSlice(i,m_nCellWavePos))
@@ -723,36 +687,17 @@ void NewPan::DealCellPos()
         }
         SetCellWavePos(i,m_nCellWavePos);
         SetCellRunStyle(i,RUN_PLAN);
-        SetCellEccRadius(i,MAX_RADIUS);
         CreateCellPath(i);
     }
 }
 
-int NewPan::DetectCollision(int nID, int mID)
+bool NewPan::DetectCollision(int nID, int mID)
 {
-    int nValue=0;
     CreateCellPath(nID);
     CreateCellPath(mID);
-    QPainterPath path1=m_pNewCell[nID-1]->GetCenPath();
-    QPainterPath path2=m_pNewCell[nID-1]->GetEccPath();
-    QPainterPath path3=m_pNewCell[mID-1]->GetCenPath();
-    QPainterPath path4=m_pNewCell[mID-1]->GetEccPath();
-    bool b1=path1.intersects(path4);//nÖĞĞÄÖáÓëmÆ«ĞÄÖá
-    bool b2=path2.intersects(path3);//nÆ«ĞÄÖáÓëmÖĞĞÄÖá
-    bool b3=path2.intersects(path4);//nÆ«ĞÄÖáÓëmÆ«ĞÄÖá
-    if(b1)
-    {
-        nValue+=100;
-    }
-    if(b2)
-    {
-        nValue+=10;
-    }
-    if(b3)
-    {
-        nValue+=1;
-    }
-    return nValue;
+    QPainterPath path1=CellPath(nID);
+    QPainterPath path2=CellPath(mID);
+    return (path1.intersects(path2));
 }
 
 void NewPan::DealSolution()
@@ -762,13 +707,12 @@ void NewPan::DealSolution()
         for(int j = 1;j <= NEW_NUM;j++)
         {
             int nDistance=CellDistance(m_nRunID[i],j);
-            if(nDistance==INT_SPACE)
+            if(nDistance==NEW_SPACE)
             {
-                int nResult=0;
                 bool bDeal=false;
-                while(nResult=DetectCollision(m_nRunID[i],j))
+                while(DetectCollision(m_nRunID[i],j))
                 {
-                    DealCollision(m_nRunID[i],j,m_nCellWavePos,nResult);
+                    DealCollision(m_nRunID[i],j,m_nCellWavePos);
                     bDeal=true;
                 }
                 if(bDeal)
@@ -780,92 +724,79 @@ void NewPan::DealSolution()
     }
 }
 
-void NewPan::DealCollision(int nID, int mID, int nPos, int nResult)
+void NewPan::DealCollision(int nID, int mID, int nPos)
 {
-    int nCE=nResult/100;     //nÖĞĞÄÖáÓëmÆ«ĞÄÖáÏàÅö£¬Æ«ĞÄÖáÒ»¶¨ÊÇÕ¹¿ªµÄ
-    int nEC=nResult%100/10;  //nÆ«ĞÄÖáÓëmÖĞĞÄÖáÏàÅö£¬Æ«ĞÄÖáÒ»¶¨ÊÇÕ¹¿ªµÄ
-    int nEE=nResult%10;      //nÆ«ĞÄÖáÓëmÆ«ĞÄÖáÏàÅö£¬Æ«ĞÄÖáÖÁÉÙÓĞÒ»¸öÊÇÕ¹¿ªµÄ
-    if(nCE)
+//nåå¿ƒè½´ä¸måå¿ƒè½´ç›¸ç¢°ï¼Œåå¿ƒè½´è‡³å°‘æœ‰ä¸€ä¸ªæ˜¯å±•å¼€çš„
+    int nBasis=m_mapResult[QString::number(nID,10)+QString::number(mID,10)];
+    int mBasis=m_mapResult[QString::number(mID,10)+QString::number(nID,10)];
+    //nIDå·²åˆ°è¾¾è¿‡ç›®æ ‡ä½ç½®ï¼ŒmIDæœªåˆ°è¾¾è¿‡ç›®æ ‡ä½ç½®
+    if(m_bDealRuned[nID-1]&&!m_bDealRuned[mID-1])
     {
-        DealCenMethod(nID,mID,nPos);
+        DealEccMethod(nID,mID,nPos,nBasis);
     }
-    if(nEC)
+    //mIDå·²åˆ°è¾¾è¿‡ç›®æ ‡ä½ç½®ï¼ŒnIDæœªåˆ°è¾¾è¿‡ç›®æ ‡ä½ç½®
+    else if(m_bDealRuned[mID-1]&&!m_bDealRuned[nID-1])
     {
-        DealCenMethod(mID,nID,nPos);
+        DealEccMethod(mID,nID,nPos,mBasis);
     }
-    if(nEE)
+    //nIDå·²åˆ°è¾¾è¿‡ç›®æ ‡ä½ç½®ï¼ŒmIDå·²åˆ°è¾¾è¿‡ç›®æ ‡ä½ç½®
+    else if(m_bDealRuned[nID-1]&&m_bDealRuned[mID-1])
     {
-        int nBasis=m_mapResult[QString::number(nID,10)+QString::number(mID,10)];
-        int mBasis=m_mapResult[QString::number(mID,10)+QString::number(nID,10)];
-        //nIDÒÑµ½´ï¹ıÄ¿±êÎ»ÖÃ£¬mIDÎ´µ½´ï¹ıÄ¿±êÎ»ÖÃ
-        if(m_bDealRuned[nID-1]&&!m_bDealRuned[mID-1])
+        if(CalCenSlice(nID,nPos)==CenTargetSlice(nID))
         {
             DealEccMethod(nID,mID,nPos,nBasis);
         }
-        //mIDÒÑµ½´ï¹ıÄ¿±êÎ»ÖÃ£¬nIDÎ´µ½´ï¹ıÄ¿±êÎ»ÖÃ
-        else if(m_bDealRuned[mID-1]&&!m_bDealRuned[nID-1])
+        else
         {
             DealEccMethod(mID,nID,nPos,mBasis);
         }
-        //nIDÒÑµ½´ï¹ıÄ¿±êÎ»ÖÃ£¬mIDÒÑµ½´ï¹ıÄ¿±êÎ»ÖÃ
-        else if(m_bDealRuned[nID-1]&&m_bDealRuned[mID-1])
+    }
+    //nIDæœªåˆ°è¾¾è¿‡ç›®æ ‡ä½ç½®ï¼ŒmIDæœªåˆ°è¾¾è¿‡ç›®æ ‡ä½ç½®
+    else
+    {
+        if(EccTargetSlice(nID)-CalEccSlice(nID,nPos)<=EccTargetSlice(mID)-CalEccSlice(mID,nPos))
         {
-            if(CalCenSlice(nID,nPos)==CenTargetSlice(nID))
-            {
-                DealEccMethod(nID,mID,nPos,nBasis);
-            }
-            else
-            {
-                DealEccMethod(mID,nID,nPos,mBasis);
-            }
+            DealEccMethod(nID,mID,nPos,nBasis);
         }
-        //nIDÎ´µ½´ï¹ıÄ¿±êÎ»ÖÃ£¬mIDÎ´µ½´ï¹ıÄ¿±êÎ»ÖÃ
         else
         {
-            if(EccTargetSlice(nID)-CalEccSlice(nID,nPos)<=EccTargetSlice(mID)-CalEccSlice(mID,nPos))
-            {
-                DealEccMethod(nID,mID,nPos,nBasis);
-            }
-            else
-            {
-                DealEccMethod(mID,nID,nPos,mBasis);
-            }
+            DealEccMethod(mID,nID,nPos,mBasis);
         }
     }
 }
 
 void NewPan::DealCenMethod(int nID, int mID, int nPos)
 {
-    /// nIDµ¥ÔªÖĞĞÄÖáÓëmIDµ¥ÔªÆ«ĞÄÖáÅö×²£¬ÒÔnIDµ¥ÔªÖĞĞÄÖáÎªÒÀ¾İ£¬´¦ÀímIDµ¥ÔªÖĞĞÄÖá¡¢Æ«ĞÄÖá
-    //nIDµ¥Ôª²»ÔË¶¯»òÖĞĞÄÖá×ª¶¯µ½Ä¿±êÎ»ÖÃ
+    /// nIDå•å…ƒä¸­å¿ƒè½´ä¸mIDå•å…ƒåå¿ƒè½´ç¢°æ’ï¼Œä»¥nIDå•å…ƒä¸­å¿ƒè½´ä¸ºä¾æ®ï¼Œå¤„ç†mIDå•å…ƒä¸­å¿ƒè½´ã€åå¿ƒè½´
+    //nIDå•å…ƒä¸è¿åŠ¨æˆ–ä¸­å¿ƒè½´è½¬åŠ¨åˆ°ç›®æ ‡ä½ç½®
     if(CenTargetSlice(nID)==CalCenSlice(nID,nPos))
     {
-        //µ±Ç°Î»ÖÃÊıÒÑ¾­´óÓÚmIDÖĞĞÄÖáÄ¿±êÎ»ÖÃ£¬Ö»ÄÜ´¦ÀíÖĞĞÄÖá
+        //å½“å‰ä½ç½®æ•°å·²ç»å¤§äºmIDä¸­å¿ƒè½´ç›®æ ‡ä½ç½®ï¼Œåªèƒ½å¤„ç†ä¸­å¿ƒè½´
         if(CenTargetSlice(mID)<nPos)
         {
             DealCen(mID,nPos);
         }
-        //µ±Ç°mIDÖĞĞÄÖá»¹ÔÚ×ª¶¯£¬´¦ÀíÆ«ĞÄÖá
+        //å½“å‰mIDä¸­å¿ƒè½´è¿˜åœ¨è½¬åŠ¨ï¼Œå¤„ç†åå¿ƒè½´
         else
         {
             DealEcc(mID,nPos);
         }
     }
-    //nIDµ¥ÔªÎ´×ª¶¯µ½Ä¿±êÎ»ÖÃ
+    //nIDå•å…ƒæœªè½¬åŠ¨åˆ°ç›®æ ‡ä½ç½®
     else
     {
-        //Æ«ĞÄÖá×ª¶¯µ½0Ê±£¬²»»áÓëÖĞĞÄÖáÏàÅö
+        //åå¿ƒè½´è½¬åŠ¨åˆ°0æ—¶ï¼Œä¸ä¼šä¸ä¸­å¿ƒè½´ç›¸ç¢°
         DealEcc(mID,nPos);
     }
 }
 
 void NewPan::DealEccMethod(int nID, int mID, int nPos, int nBasis)
 {
-    /// nIDµ¥ÔªÆ«ĞÄÖáÓëmIDµ¥ÔªÆ«ĞÄÖáÏàÅö£¬ÒÔnIDµ¥ÔªÔÚÖĞĞÄÖáÄ¿±êÎ»ÖÃÊ±ÆäÆ«ĞÄÖá´Ó0µ½Ä¿±êÎ»ÖÃ×ª¶¯
-    /// ÓëmIDµ¥ÔªÄ¿±êÎ»ÖÃµÄÅö×²Çé¿öÎªÒÀ¾İ£¬´¦ÀínID¡¢mIDµ¥ÔªÇé¿ö
+    /// nIDå•å…ƒåå¿ƒè½´ä¸mIDå•å…ƒåå¿ƒè½´ç›¸ç¢°ï¼Œä»¥nIDå•å…ƒåœ¨ä¸­å¿ƒè½´ç›®æ ‡ä½ç½®æ—¶å…¶åå¿ƒè½´ä»0åˆ°ç›®æ ‡ä½ç½®è½¬åŠ¨
+    /// ä¸mIDå•å…ƒç›®æ ‡ä½ç½®çš„ç¢°æ’æƒ…å†µä¸ºä¾æ®ï¼Œå¤„ç†nIDã€mIDå•å…ƒæƒ…å†µ
     switch(nBasis)
     {
-    //nIDµ¥ÔªÆ«ĞÄÖáÉ¨¹ıµÄÇøÓòÓëmIDµ¥ÔªÄ¿±êÎ»ÖÃÎŞÅö×²
+    //nIDå•å…ƒåå¿ƒè½´æ‰«è¿‡çš„åŒºåŸŸä¸mIDå•å…ƒç›®æ ‡ä½ç½®æ— ç¢°æ’
     case BASIS_NULL:
         if(CalEccSlice(nID,nPos)>0)
         {
@@ -876,23 +807,8 @@ void NewPan::DealEccMethod(int nID, int mID, int nPos, int nBasis)
             DealEcc(mID,nPos);
         }
         break;
-    //nIDµ¥ÔªÆ«ĞÄÖáÉ¨¹ıµÄÇøÓòÓëmIDµ¥ÔªÖĞĞÄÖáÄ¿±êÎ»ÖÃÅö×²
-    case BASIS_CEN:
-        if(CalEccSlice(mID,nPos)>0)
-        {
-            DealEcc(mID,nPos);
-        }
-        else
-        {
-            DealCen(nID,nPos);
-        }
-        break;
-    //nIDµ¥ÔªÆ«ĞÄÖáÉ¨¹ıµÄÇøÓòÓëmIDµ¥ÔªÆ«ĞÄÖáÄ¿±êÎ»ÖÃÅö×²
+    //nIDå•å…ƒåå¿ƒè½´æ‰«è¿‡çš„åŒºåŸŸä¸mIDå•å…ƒåå¿ƒè½´ç›®æ ‡ä½ç½®ç¢°æ’
     case BASIS_ECC:
-        DealCen(nID,nPos);
-        break;
-    //nIDµ¥ÔªÆ«ĞÄÖáÉ¨¹ıµÄÇøÓòÓëmIDµ¥ÔªÄ¿±êÎ»ÖÃ¶¼Åö×²
-    case BASIS_CEC:
         DealCen(nID,nPos);
         break;
     default:
@@ -907,7 +823,7 @@ void NewPan::SolutionBasis()
         for(int j = 1;j <= NEW_NUM;j++)
         {
             int nDistance=CellDistance(m_nRunID[i],j);
-            if(m_nRunID[i]!=j&&nDistance==INT_SPACE)
+            if(m_nRunID[i]!=j&&nDistance==NEW_SPACE)
             {
                 QString key=QString::number(m_nRunID[i],10)+QString::number(j,10);
                 int nResult=DealBasis(m_nRunID[i],j);
@@ -919,7 +835,7 @@ void NewPan::SolutionBasis()
 
 int NewPan::DealBasis(int nID, int mID)
 {
-    //nIDµ¥ÔªÖĞĞÄÖáÔÚÄ¿±êÎ»ÖÃ£¬Æ«ĞÄÖá´Ó0µ½Ä¿±êÎ»ÖÃÊÇ·ñÓëmIDµÄÖĞĞÄÖá/Æ«ĞÄÖáÄ¿±êÎ»ÖÃÅö×²
+    //nIDå•å…ƒä¸­å¿ƒè½´åœ¨ç›®æ ‡ä½ç½®ï¼Œåå¿ƒè½´ä»0åˆ°ç›®æ ‡ä½ç½®æ˜¯å¦ä¸mIDçš„ä¸­å¿ƒè½´/åå¿ƒè½´ç›®æ ‡ä½ç½®ç¢°æ’
     int nResult=BASIS_NULL;
     SetCellCenSlice(nID,CenTargetSlice(nID));
     SetCellCenSlice(mID,CenTargetSlice(mID));
@@ -927,35 +843,17 @@ int NewPan::DealBasis(int nID, int mID)
     SetCellRunStyle(nID,RUN_COM);
     SetCellRunStyle(mID,RUN_COM);
     CreateCellPath(mID);
-    QPainterPath path1=CellCenPath(mID);
-    QPainterPath path2=CellEccPath(mID);
-    bool b1=false;
-    bool b2=false;
+    QPainterPath path1=CellPath(mID);
     for(int nSlice=0;nSlice<=EccTargetSlice(nID);nSlice++)
     {
         SetCellEccSlice(nID,nSlice);
         CreateCellPath(nID);
-        QPainterPath path3=CellEccPath(nID);
-        if(path1.intersects(path3))
+        QPainterPath path2=CellPath(nID);
+        if(path1.intersects(path2))
         {
-            b1=true;
+            nResult=BASIS_ECC;
+            return nResult;
         }
-        if(path2.intersects(path3))
-        {
-            b2=true;
-        }
-    }
-    if(b1&&!b2)
-    {
-        nResult=BASIS_CEN;
-    }
-    else if(!b1&&b2)
-    {
-        nResult=BASIS_ECC;
-    }
-    else if(b1&&b2)
-    {
-        nResult=BASIS_CEC;
     }
     return nResult;
 }
@@ -966,11 +864,11 @@ void NewPan::DealNearCell(int nID, int mID, int nPos)
     {
         int nL1=CellDistance(nID,i);
         int nL2=CellDistance(mID,i);
-        if(nL1==INT_SPACE)
+        if(nL1==NEW_SPACE)
         {
            DealEachPos(nID,i,nPos);
         }
-        if(nL2==INT_SPACE)
+        if(nL2==NEW_SPACE)
         {
            DealEachPos(mID,i,nPos);
         }
@@ -983,11 +881,10 @@ void NewPan::DealEachPos(int nID, int mID, int nPos)
     {
         SetCellWavePos(nID,i);
         SetCellWavePos(mID,i);
-        int nResult=0;
         bool bDeal=false;
-        while(nResult=DetectCollision(nID,mID))
+        while(DetectCollision(nID,mID))
         {
-            DealCollision(nID,mID,i,nResult);
+            DealCollision(nID,mID,i);
             bDeal=true;
         }
         if(bDeal)
@@ -999,52 +896,80 @@ void NewPan::DealEachPos(int nID, int mID, int nPos)
 
 void NewPan::DealCen(int nID, int nPos)
 {
-    //´¦ÀíÖ®Ç°°Ñ²¨ĞÎ·Ö¶Î´óÓÚ2£¬¼´Îª3¶Î£¬×î¶àÖ»ÓĞ3¶Î£¬½»»»µÚ2¡¢3¶ÎÒÆÖÁ³ÉÁ½¶Î
-    DealCenWave(nID,2);
-    int nMove=0;
+    //å¤„ç†ä¹‹å‰æŠŠæ³¢å½¢åˆ†æ®µå¤§äº2ï¼Œå³ä¸º3æ®µï¼Œæœ€å¤šåªæœ‰3æ®µï¼Œäº¤æ¢ç¬¬2ã€3æ®µç§»è‡³æˆä¸¤æ®µ
+//    DealCenWave(nID,2);
+//    int nMove=0;
+//    for(int i=0;i<DEAL_SLICE;i++)
+//    {
+//        while(CellCenPosValue(nID,nMove)!=BYTE_RUN
+//              &&nMove<nPos)
+//        {
+//            nMove++;
+//        }
+//        if(CellCenPosValue(nID,nMove)==BYTE_RUN)
+//        {
+//            SetCenPosValue(nID,nMove,BYTE_STOP);
+//            int nEnd=CellCenFinalPos(nID);
+//            SetCenPosValue(nID,nEnd,BYTE_RUN);
+//        }
+//    }
     for(int i=0;i<DEAL_SLICE;i++)
     {
-        while(CellCenPosValue(nID,nMove)!=BYTE_RUN
-              &&nMove<nPos)
+        while(CellCenPosValue(nID,nPos)!=BYTE_RUN
+              &&nPos>1)
         {
-            nMove++;
+            nPos--;
         }
-        if(CellCenPosValue(nID,nMove)==BYTE_RUN)
+        if(CellCenPosValue(nID,nPos)==BYTE_RUN)
         {
-            SetCenPosValue(nID,nMove,BYTE_STOP);
+            SetCenPosValue(nID,nPos,BYTE_STOP);
             int nEnd=CellCenFinalPos(nID);
             SetCenPosValue(nID,nEnd,BYTE_RUN);
         }
     }
-    //´¦ÀíÖ®ºó£¬Îª3¶ÎµÄ²»´¦Àí£¬Îª4¶Î£¬½»»»µÚ2¡¢3¶ÎÒÆÖÁ³ÉÁ½¶Î
-    //£¨4¶Î£ºÊ×ÏÈÒÑµ½´ïÄ¿±êÎ»ÖÃ£¬1¶Î£º´¦ÀíµÄÔİÍ£DEAL_SLICE¸öÎ»ÖÃ£»2¶Î£ºµ½´ïÄ¿±êÎ»ÖÃÔËĞĞµÄÉÙDEAL_SLICE¸öµÄÎ»ÖÃ£»
-    // 3¶Î£ºµ½´ïÄ¿±êÎ»ÖÃºóÔİÍ£µÄDEAL_SLICE¸öÎ»ÖÃ£»4¶Î£º²¹³äµÄDEAL_SLICE¸öÎ»ÖÃºóµ½´ïÄ¿±êÎ»ÖÃ£©
-    DealCenWave(nID,3);
+    //å¤„ç†ä¹‹åï¼Œä¸º3æ®µçš„ä¸å¤„ç†ï¼Œä¸º4æ®µï¼Œäº¤æ¢ç¬¬2ã€3æ®µç§»è‡³æˆä¸¤æ®µ
+    //ï¼ˆ4æ®µï¼šé¦–å…ˆå·²åˆ°è¾¾ç›®æ ‡ä½ç½®ï¼Œ1æ®µï¼šå¤„ç†çš„æš‚åœDEAL_SLICEä¸ªä½ç½®ï¼›2æ®µï¼šåˆ°è¾¾ç›®æ ‡ä½ç½®è¿è¡Œçš„å°‘DEAL_SLICEä¸ªçš„ä½ç½®ï¼›
+    // 3æ®µï¼šåˆ°è¾¾ç›®æ ‡ä½ç½®åæš‚åœçš„DEAL_SLICEä¸ªä½ç½®ï¼›4æ®µï¼šè¡¥å……çš„DEAL_SLICEä¸ªä½ç½®ååˆ°è¾¾ç›®æ ‡ä½ç½®ï¼‰
+//    DealCenWave(nID,3);
 }
 
 void NewPan::DealEcc(int nID, int nPos)
 {
-    //´¦ÀíÖ®Ç°°Ñ²¨ĞÎ·Ö¶Î´óÓÚ2£¬¼´Îª3¶Î£¬×î¶àÖ»ÓĞ3¶Î£¬½»»»µÚ2¡¢3¶ÎÒÆÖÁ³ÉÁ½¶Î
-    DealEccWave(nID,2);
-    int nMove=0;
+    //å¤„ç†ä¹‹å‰æŠŠæ³¢å½¢åˆ†æ®µå¤§äº2ï¼Œå³ä¸º3æ®µï¼Œæœ€å¤šåªæœ‰3æ®µï¼Œäº¤æ¢ç¬¬2ã€3æ®µç§»è‡³æˆä¸¤æ®µ
+//    DealEccWave(nID,2);
+//    int nMove=0;
+//    for(int i=0;i<DEAL_SLICE;i++)
+//    {
+//        while(CellEccPosValue(nID,nMove)!=BYTE_RUN
+//              &&nMove<nPos)
+//        {
+//            nMove++;
+//        }
+//        if(CellEccPosValue(nID,nMove)==BYTE_RUN)
+//        {
+//            SetEccPosValue(nID,nMove,BYTE_STOP);
+//            int nEnd=CellEccFinalPos(nID);
+//            SetEccPosValue(nID,nEnd,BYTE_RUN);
+//        }
+//    }
     for(int i=0;i<DEAL_SLICE;i++)
     {
-        while(CellEccPosValue(nID,nMove)!=BYTE_RUN
-              &&nMove<nPos)
+        while(CellEccPosValue(nID,nPos)!=BYTE_RUN
+              &&nPos>1)
         {
-            nMove++;
+            nPos--;
         }
-        if(CellEccPosValue(nID,nMove)==BYTE_RUN)
+        if(CellEccPosValue(nID,nPos)==BYTE_RUN)
         {
-            SetEccPosValue(nID,nMove,BYTE_STOP);
+            SetEccPosValue(nID,nPos,BYTE_STOP);
             int nEnd=CellEccFinalPos(nID);
             SetEccPosValue(nID,nEnd,BYTE_RUN);
         }
     }
-    //´¦ÀíÖ®ºó£¬Îª3¶ÎµÄ²»´¦Àí£¬Îª4¶Î£¬½»»»µÚ2¡¢3¶ÎÒÆÖÁ³ÉÁ½¶Î
-    //£¨4¶Î£ºÊ×ÏÈÒÑµ½´ïÄ¿±êÎ»ÖÃ£¬1¶Î£º´¦ÀíµÄÔİÍ£DEAL_SLICE¸öÎ»ÖÃ£»2¶Î£ºµ½´ïÄ¿±êÎ»ÖÃÔËĞĞµÄÉÙDEAL_SLICE¸öµÄÎ»ÖÃ£»
-    // 3¶Î£ºµ½´ïÄ¿±êÎ»ÖÃºóÔİÍ£µÄDEAL_SLICE¸öÎ»ÖÃ£»4¶Î£º²¹³äµÄDEAL_SLICE¸öÎ»ÖÃºóµ½´ïÄ¿±êÎ»ÖÃ£©
-    DealEccWave(nID,3);
+    //å¤„ç†ä¹‹åï¼Œä¸º3æ®µçš„ä¸å¤„ç†ï¼Œä¸º4æ®µï¼Œäº¤æ¢ç¬¬2ã€3æ®µç§»è‡³æˆä¸¤æ®µ
+    //ï¼ˆ4æ®µï¼šé¦–å…ˆå·²åˆ°è¾¾ç›®æ ‡ä½ç½®ï¼Œ1æ®µï¼šå¤„ç†çš„æš‚åœDEAL_SLICEä¸ªä½ç½®ï¼›2æ®µï¼šåˆ°è¾¾ç›®æ ‡ä½ç½®è¿è¡Œçš„å°‘DEAL_SLICEä¸ªçš„ä½ç½®ï¼›
+    // 3æ®µï¼šåˆ°è¾¾ç›®æ ‡ä½ç½®åæš‚åœçš„DEAL_SLICEä¸ªä½ç½®ï¼›4æ®µï¼šè¡¥å……çš„DEAL_SLICEä¸ªä½ç½®ååˆ°è¾¾ç›®æ ‡ä½ç½®ï¼‰
+//    DealEccWave(nID,3);
 }
 
 void NewPan::DealCenWave(int nID, int nPart)
@@ -1193,7 +1118,7 @@ void NewPan::ResetRun()
     killTimer(m_nComTimerID);
     killTimer(m_nPlanTimerID);
     killTimer(m_nLastTimerID);
-    m_nSliceIndex=0;//×ª¹ı¶ÈÊıÉèÎª0
+    m_nSliceIndex=0;//è½¬è¿‡åº¦æ•°è®¾ä¸º0
     m_nPlayIndex=0;
     m_bRunStatus=false;
     for (int i = 0; i < m_nRunNum;i++)
@@ -1201,7 +1126,6 @@ void NewPan::ResetRun()
         SetCellCenSlice(m_nRunID[i],0);
         SetCellEccSlice(m_nRunID[i],0);
         SetCellRunStyle(m_nRunID[i],RUN_COM);
-        SetCellEccRadius(m_nRunID[i],MAX_RADIUS);
     }
     m_pNewPaint->update();
 }
@@ -1222,23 +1146,12 @@ void NewPan::DealRandom()
         for(int j = 1;j <= CELL_NUM;j++)
         {
             int nDistance=CellDistance(m_nRunID[i],j);
-            if(nDistance==INT_SPACE)
+            if(nDistance==NEW_SPACE)
             {
                 SetCellFinalValue(m_nRunID[i]);
                 SetCellFinalValue(j);
-                int nResult=DetectCollision(m_nRunID[i],j);
-                int nCE=nResult/100;                       //nÖĞĞÄÖáÓëmÆ«ĞÄÖáÏàÅö£¬Æ«ĞÄÖáÒ»¶¨ÊÇÕ¹¿ªµÄ
-                int nEC=nResult%100/10;                    //nÆ«ĞÄÖáÓëmÖĞĞÄÖáÏàÅö£¬Æ«ĞÄÖáÒ»¶¨ÊÇÕ¹¿ªµÄ
-                int nEE=nResult%10;                        //nÆ«ĞÄÖáÓëmÆ«ĞÄÖáÏàÅö£¬Æ«ĞÄÖáÖÁÉÙÓĞÒ»¸öÊÇÕ¹¿ªµÄ
-                if(nCE)
-                {
-                    ResetCell(j);
-                }
-                else if(nEC)
-                {
-                    ResetCell(m_nRunID[i]);
-                }
-                else if(nEE)
+                bool b=DetectCollision(m_nRunID[i],j);
+                if(b)
                 {
                     if(m_bDealRuned[j-1])
                     {
@@ -1264,7 +1177,7 @@ void NewPan::DealRandom()
                         double jy=jcy-jRadius*sin(jRadian);
                         double iR=sqrt((jx-icx)*(jx-icx)+(jy-icy)*(jy-icy));
                         double jR=sqrt((ix-jcx)*(ix-jcx)+(iy-jcy)*(iy-jcy));
-                        if(int(iR)==INT_SPACE||int(jR)==INT_SPACE)
+                        if(int(iR)==NEW_SPACE||int(jR)==NEW_SPACE)
                         {
                             ResetCell(m_nRunID[i]);
                             break;

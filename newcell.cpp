@@ -5,7 +5,7 @@ NewCell::NewCell(int nID, bool bStatus, double dCenterX, double dCenterY)
 {
     m_nCurrentCenSlice=0;
     m_nCurrentEccSlice=0;
-    m_dChamferDegree=0;
+    m_dEccDegree=0;
     m_dCenRadian=0;
     m_nCenRadSlice=0;
     m_dEccRadian=0;
@@ -13,27 +13,10 @@ NewCell::NewCell(int nID, bool bStatus, double dCenterX, double dCenterY)
     m_nStartRadSlice=0;
     m_nRunRadSlice=0;
     m_nWavePos=0;
-    m_nRunStyle=RUN_COM;//Ò»°ãÔËĞĞ·½Ê½
-    m_dREcc=MAX_RADIUS; //Æ«ĞÄÖá°ë¾¶×î´ó
-    m_ptCenP1=QPointF(-2.75,-3.9);
-    m_ptCenP2=QPointF(-2.75,-6.9);
-    m_ptCenP3=QPointF(10.25,-6.9);
-    m_ptCenP4=QPointF(10.25,-3.9);
-    m_ptEccP1=QPointF(0,0);
-    m_ptEccP2=QPointF(0,0);
-    m_ptEccP3=QPointF(0,0);
-    m_ptEccP4=QPointF(0,0);
-    m_ptEccR1=QPointF(0,0);
-    m_ptEccR2=QPointF(0,0);
-    m_ptEccR3=QPointF(0,0);
-    m_dLenghtP1=LengthByPoint(m_ptCenP1);
-    m_dLenghtP2=LengthByPoint(m_ptCenP2);
-    m_dLenghtP3=LengthByPoint(m_ptCenP3);
-    m_dLenghtP4=LengthByPoint(m_ptCenP4);
-    m_dRadianP1=atan(m_ptCenP1.y()/m_ptCenP1.x())+PI;
-    m_dRadianP2=atan(m_ptCenP2.y()/m_ptCenP2.x())+PI;
-    m_dRadianP3=atan(m_ptCenP3.y()/m_ptCenP3.x())+2*PI;
-    m_dRadianP4=atan(m_ptCenP4.y()/m_ptCenP4.x())+2*PI;
+    m_nRunStyle=RUN_COM;//ä¸€èˆ¬è¿è¡Œæ–¹å¼
+    m_ptEccR1=QPointF(-16.0,0.0);
+    m_ptEccR2=QPointF(14.5,0.0);
+
     for(int i=0;i<WAVE_NUM;i++)
     {
         m_nCenWave[i]=BYTE_NULL;
@@ -46,28 +29,30 @@ NewCell::~NewCell()
 
 }
 
-//ÔËĞĞµÄµã×îÖÕ°ë¾¶ºÍ½Ç¶È
+//è¿è¡Œçš„ç‚¹æœ€ç»ˆåŠå¾„å’Œè§’åº¦
 void NewCell::InitCell(NewPan *pPan, double dRadius, double dRadian)
 {
     m_pNewPan = pPan;
     m_dRunRadian = dRadian;
-    if(dRadius<=0)
+    if(dRadius<m_dMinR)
     {
-        m_dRadius =0;
+        m_dRadius =m_dMinR;
         m_dStartRadian=acos(0);
     }
-    else if(dRadius>=2*m_dRunEcc)
+    else if(dRadius>m_dMaxR)
     {
-        m_dRadius=2*m_dRunEcc;
+        m_dRadius=m_dMaxR;
         m_dStartRadian=acos(1);
     }
     else
     {
         m_dRadius = dRadius;
-        m_dStartRadian = acos((m_dRadius*m_dRadius + m_dRunEcc*m_dRunEcc - m_dRunEcc*m_dRunEcc)
-                              /(2 * m_dRadius*m_dRunEcc));//Èı½ÇĞÎÓàÏÒ¶¨Àí
+        m_dStartRadian = acos((m_dRadius*m_dRadius + m_dCen*m_dCen - m_dEcc*m_dEcc)
+                              /(2*m_dRadius*m_dCen));//ä¸‰è§’å½¢ä½™å¼¦å®šç†
+        m_dEccRadian = acos((m_dCen*m_dCen + m_dEcc*m_dEcc - m_dRadius*m_dRadius )
+                            /(2*m_dCen*m_dEcc));//ä¸‰è§’å½¢ä½™å¼¦å®šç†
     }
-    //ÔËĞĞµÄµ¥Ôª£¬±£Ö¤»¡¶È´óÓÚ0
+    //è¿è¡Œçš„å•å…ƒï¼Œä¿è¯å¼§åº¦å¤§äº0
     if(m_bStatus)
     {
         m_dCenRadian=m_dRunRadian-m_dStartRadian;
@@ -76,11 +61,10 @@ void NewCell::InitCell(NewPan *pPan, double dRadius, double dRadian)
             m_dCenRadian+=2*PI;
         }
         m_nCenRadSlice=qRound(m_dCenRadian*SLICE_RATIO);
-        m_dEccRadian=PI-2*m_dStartRadian;
         m_nEccRadSlice=qRound(m_dEccRadian*SLICE_RATIO);
         m_nStartRadSlice=qRound(m_dStartRadian*SLICE_RATIO);
         m_nRunRadSlice=qRound(m_dRunRadian*SLICE_RATIO);
-        //µ¥ÔªÖĞĞÄÖá¡¢Æ«ĞÄÖá²¨ĞÎ¸³Öµ,Ö»¸³µ½ÒÑÓĞµÄÖµ,´¦ÀíÅö×²Ê±¼ÌĞø¸³Öµ
+        //å•å…ƒä¸­å¿ƒè½´ã€åå¿ƒè½´æ³¢å½¢èµ‹å€¼,åªèµ‹åˆ°å·²æœ‰çš„å€¼,å¤„ç†ç¢°æ’æ—¶ç»§ç»­èµ‹å€¼
         for(int i=0;i<m_nCenRadSlice;i++)
         {
             m_nCenWave[i]=BYTE_RUN;
@@ -112,23 +96,22 @@ QRect NewCell::CalRect(double dX,double dY,double dR)
     return m_pNewPan->Radius2Rect(dX, dY, dR);
 }
 
-
 void NewCell::Draw()
 {
-    //»­Ô²
+    //ç”»åœ†
     if(m_bStatus)
     {
-        DrawArc();//»­ÔËĞĞ¹ì¼£
-        DrawCenEcc();//»­Õ¹¿ªµÄÖĞĞÄÖáºÍÆ«ĞÄÖá
-        DrawTargetPos();//»­Ä¿±êµã
+        DrawArc();//ç”»è¿è¡Œè½¨è¿¹
+        DrawCenEcc();//ç”»å±•å¼€çš„ä¸­å¿ƒè½´å’Œåå¿ƒè½´
+        DrawTargetPos();//ç”»ç›®æ ‡ç‚¹
     }
     else
     {
         m_pPainter->setPen(*(m_pNewPan->m_pSolidPen[COLOR_DISUSE]));
-        m_pPainter->drawEllipse(m_rRect);//»­Î´Õ¹¿ªÔ²
+        m_pPainter->drawEllipse(m_rRect);//ç”»æœªå±•å¼€åœ†
         DrawUnexpanded();
     }
-    //Ğ´µ¥ÔªÊı
+    //å†™å•å…ƒæ•°
     m_pPainter->setPen(*(m_pNewPan->m_pSolidPen[COLOR_NUM]));
     QFont font;
     font.setPointSize(10);
@@ -138,42 +121,45 @@ void NewCell::Draw()
 
 void NewCell::DrawArc()
 {
-    //»­×îºóµÄÂäµãËùÔÚµÄÔ²
+    //ç”»æœ€åçš„è½ç‚¹æ‰€åœ¨çš„åœ†
     m_pPainter->setPen(*(m_pNewPan->m_pSolidPen[COLOR_CIRCLE]));
     m_pPainter->drawArc(m_rRect,0,360*16);
-    //»­ÔËĞĞµÄ¹ì¼£
+    //ç”»è¿è¡Œçš„è½¨è¿¹
     m_pPainter->setPen(*(m_pNewPan->m_pSolidPen[COLOR_RUN]));
     m_pPainter->drawPath(m_pathArc);
 }
 
 void NewCell::DrawCenEcc()
 {
-    //Õ¹¿ªºÛ¼£
+    //å±•å¼€ç—•è¿¹
     m_pPainter->setPen(*(m_pNewPan->m_pDddPen[COLOR_COORD]));
     m_pPainter->drawLine(m_pNewPan->Op2Vp(m_dCenterX,m_dCenterY),m_pNewPan->Op2Vp(m_ptEccR2));
     m_pPainter->drawLine(m_pNewPan->Op2Vp(m_ptEccR2),m_pNewPan->Op2Vp(m_ptEccR1));
-
-    //ÖĞĞÄÖáÍâĞÎ    Æ«ĞÄÖáÍâĞÎ
+    //ç”»åå¿ƒåœ†
+    m_pPainter->setPen(*(m_pNewPan->m_pDashPen[COLOR_CIRCLE]));
+    m_pPainter->drawEllipse(CalRect(m_ptEccR2.x(),m_ptEccR2.y(),m_dEccR2));
+    //åå¿ƒè½´å¤–å½¢
     m_pPainter->setPen(*(m_pNewPan->m_pSolidPen[COLOR_SHAFT]));
-    m_pPainter->drawPath(m_pathCen);
-    m_pPainter->drawPath(m_pathEcc);
+    m_pPainter->drawPath(m_path);
 }
 
 void NewCell::DrawUnexpanded()
 {
-    //Õ¹¿ªºÛ¼£
+    //å±•å¼€ç—•è¿¹
     m_pPainter->setPen(*(m_pNewPan->m_pDddPen[COLOR_DISUSE]));
     m_pPainter->drawLine(m_pNewPan->Op2Vp(m_dCenterX,m_dCenterY),m_pNewPan->Op2Vp(m_ptEccR2));
     m_pPainter->drawLine(m_pNewPan->Op2Vp(m_ptEccR2),m_pNewPan->Op2Vp(m_ptEccR1));
-    //ÖĞĞÄÖáÍâĞÎ    Æ«ĞÄÖáÍâĞÎ
+    //ç”»åå¿ƒåœ†
+    m_pPainter->setPen(*(m_pNewPan->m_pDashPen[COLOR_DISUSE]));
+    m_pPainter->drawEllipse(CalRect(m_ptEccR2.x(),m_ptEccR2.y(),m_dEccR2));
+    //åå¿ƒè½´å¤–å½¢
     m_pPainter->setPen(*(m_pNewPan->m_pSolidPen[COLOR_DISUSE]));
-    m_pPainter->drawPath(m_pathCen);
-    m_pPainter->drawPath(m_pathEcc);
+    m_pPainter->drawPath(m_path);
 }
 
 void NewCell::DrawTargetPos()
 {
-    //Ä¿±êµã
+    //ç›®æ ‡ç‚¹
     m_pPainter->setPen(*(m_pNewPan->m_pSolidPen[COLOR_TARGET]));
     double dRadian=m_dRunRadian;
     QPointF p=QPointF(m_dCenterX+m_dRadius*cos(dRadian),m_dCenterY-m_dRadius*sin(dRadian));
@@ -223,49 +209,39 @@ void NewCell::CalCurrentRadSlice()
 
 QPointF NewCell::CalPointBySlice(int nCenSlice, int nEccSlice)
 {
-    //ÖĞĞÄÖá£¬Æ«ĞÄÖá»¡¶È
+    //ä¸­å¿ƒè½´ï¼Œåå¿ƒè½´å¼§åº¦
     double dCenRadian=double(nCenSlice)/SLICE_RATIO;
     double dEccRadian=double(nEccSlice)/SLICE_RATIO;
-    //ÔÚÆ«ĞÄÖáÕ¹¿ª×é³ÉµÄÈı½ÇĞÎÖĞ£¬ÇóÕ¹¿ª°ë¾¶£¬°ë¾¶Õ¹¿ª»¡¶È
-    double dRadius=sqrt(m_dRunEcc*m_dRunEcc+m_dRunEcc*m_dRunEcc
-                 -2*m_dRunEcc*m_dRunEcc*cos(dEccRadian));
-    double dSpreadRadian=(PI-dEccRadian)/2.0;
+    //åœ¨åå¿ƒè½´å±•å¼€ç»„æˆçš„ä¸‰è§’å½¢ä¸­ï¼Œæ±‚å±•å¼€åŠå¾„ï¼ŒåŠå¾„å±•å¼€å¼§åº¦
+    double dRadius=sqrt(m_dCen*m_dCen+m_dEcc*m_dEcc
+                 -2*m_dCen*m_dEcc*cos(dEccRadian));
+    double dSpreadRadian=acos((dRadius*dRadius + m_dCen*m_dCen - m_dEcc*m_dEcc)
+                              /(2*dRadius*m_dCen));//ä¸‰è§’å½¢ä½™å¼¦å®šç†
     return QPointF(m_dCenterX+dRadius*cos(dCenRadian+dSpreadRadian),
                    m_dCenterY-dRadius*sin(dCenRadian+dSpreadRadian));
 }
 
 void NewCell::CreatePoint()
 {
-    m_rRect = CalRect(m_dCenterX,m_dCenterY,m_dRadius);//Ã¿ÖØ»­Ò»´Î£¬¶¼Òª¼ÆËãÒ»´Î
+    m_rRect = CalRect(m_dCenterX,m_dCenterY,m_dRadius);//æ¯é‡ç”»ä¸€æ¬¡ï¼Œéƒ½è¦è®¡ç®—ä¸€æ¬¡
     if((m_nRunStyle==RUN_PLAN||m_nRunStyle==RUN_LAST)&&m_bStatus)
     {
         CalCurrentRadSlice();
     }
-    //ÖĞĞÄÖáÍâĞÎ¾ØĞÎ4µã
-    //ÖĞĞÄÖá×ª¶¯µÄ»¡¶È
+    //ä¸­å¿ƒè½´è½¬åŠ¨çš„å¼§åº¦
     double dCenRadian=double(m_nCurrentCenSlice)/SLICE_RATIO;
-    double dPA1=dCenRadian+m_dRadianP1;
-    double dPA2=dCenRadian+m_dRadianP2;
-    double dPA3=dCenRadian+m_dRadianP3;
-    double dPA4=dCenRadian+m_dRadianP4;
-    m_ptCenP1=QPointF(m_dCenterX+m_dLenghtP1*cos(dPA1),m_dCenterY-m_dLenghtP1*sin(dPA1));
-    m_ptCenP2=QPointF(m_dCenterX+m_dLenghtP2*cos(dPA2),m_dCenterY-m_dLenghtP2*sin(dPA2));
-    m_ptCenP3=QPointF(m_dCenterX+m_dLenghtP3*cos(dPA3),m_dCenterY-m_dLenghtP3*sin(dPA3));
-    m_ptCenP4=QPointF(m_dCenterX+m_dLenghtP4*cos(dPA4),m_dCenterY-m_dLenghtP4*sin(dPA4));
-
-    //Æ«ĞÄÖáÍâĞÎ¾ØĞÎ4µã£¬ÖĞĞÄ3µã
-    double dCenDistance=m_dEcc-2*m_dREcc-m_dRunEcc;
+    //åå¿ƒè½´å¤–å½¢çŸ©å½¢4ç‚¹ï¼Œä¸­å¿ƒ3ç‚¹
     m_ptEccR1=CalPointBySlice(m_nCurrentCenSlice,m_nCurrentEccSlice);
-    m_ptEccR2=QPointF(m_dCenterX+m_dRunEcc*cos(dCenRadian),
-                      m_dCenterY-m_dRunEcc*sin(dCenRadian));
+    m_ptEccR2=QPointF(m_dCenterX+m_dCen*cos(dCenRadian),
+                      m_dCenterY-m_dCen*sin(dCenRadian));
     double dEccFabsRadian=asin(fabs(m_ptEccR2.y()-m_ptEccR1.y())
                                /LengthByPoint(m_ptEccR1,m_ptEccR2));
-    double dEccRadian=0;//Æ«ĞÄÖáÔÚÊÓÍ¼×ø±êÖĞµÄ»¡¶È
+    double dEccRadian=0;//åå¿ƒè½´åœ¨è§†å›¾åæ ‡ä¸­çš„å¼§åº¦
     double dCX1=m_ptEccR1.x();
     double dCY1=m_ptEccR1.y();
     double dCX2=m_ptEccR2.x();
     double dCY2=m_ptEccR2.y();
-    //Æ«ĞÄÖáÔÚÊÓÍ¼×ø±êÖĞµÄ»¡¶È£¬¸ù¾İÆ«ĞÄÖáÁ½¸öÔ²»¡ÖĞĞÄµãÎ»ÖÃ
+    //åå¿ƒè½´åœ¨è§†å›¾åæ ‡ä¸­çš„å¼§åº¦ï¼Œæ ¹æ®åå¿ƒè½´ä¸¤ä¸ªåœ†å¼§ä¸­å¿ƒç‚¹ä½ç½®
     if(dCX1>=dCX2&&dCY1<=dCY2)
     {
         dEccRadian=dEccFabsRadian;
@@ -282,60 +258,43 @@ void NewCell::CreatePoint()
     {
         dEccRadian=2*PI-dEccFabsRadian;
     }
-    double dChamferRadian=dEccRadian-PI/2.0;
-    m_dChamferDegree=dChamferRadian/PI*180.0;
-    m_ptEccR3=QPointF(m_ptEccR2.x()-dCenDistance*cos(dEccRadian),
-                      m_ptEccR2.y()+dCenDistance*sin(dEccRadian));
-    m_ptEccP1=QPointF(m_ptEccR1.x()-m_dREcc*cos(dChamferRadian),
-                      m_ptEccR1.y()+m_dREcc*sin(dChamferRadian));
-    m_ptEccP2=QPointF(m_ptEccR1.x()+m_dREcc*cos(dChamferRadian),
-                      m_ptEccR1.y()-m_dREcc*sin(dChamferRadian));
-    m_ptEccP3=QPointF(m_ptEccR3.x()+m_dREcc*cos(dChamferRadian),
-                      m_ptEccR3.y()-m_dREcc*sin(dChamferRadian));
-    m_ptEccP4=QPointF(m_ptEccR3.x()-m_dREcc*cos(dChamferRadian),
-                      m_ptEccR3.y()+m_dREcc*sin(dChamferRadian));
+    m_dEccDegree=dEccRadian/PI*180.0;
 }
 
 void NewCell::CreatePath()
 {
     CreatePoint();
-    //ÖĞĞÄÖáÍâĞÎ
-    QPainterPath cenPath;
-    cenPath.moveTo(m_pNewPan->Op2Vp(m_ptCenP1));
-    cenPath.lineTo(m_pNewPan->Op2Vp(m_ptCenP2));
-    cenPath.lineTo(m_pNewPan->Op2Vp(m_ptCenP3));
-    cenPath.lineTo(m_pNewPan->Op2Vp(m_ptCenP4));
-    cenPath.closeSubpath();
-    m_pathCen=cenPath;
-    //Æ«ĞÄÖáÍâĞÎ
+    //åå¿ƒè½´å¤–å½¢
     QPainterPath eccPath;
-    //·½ÏòÎªP2,P1,P4,P3
-    //´ÓÔ²»¡µÄP2µã¿ªÊ¼
-    eccPath.arcMoveTo(m_pNewPan->Radius2Rect(m_ptEccR1.x(), m_ptEccR1.y(), m_dREcc),
-                      m_dChamferDegree);
-    //Ë³Ê±Õë180¡ã´ÓP2µ½P1
-    eccPath.arcTo(m_pNewPan->Radius2Rect(m_ptEccR1.x(), m_ptEccR1.y(), m_dREcc),
-                  m_dChamferDegree,180.0);
-    //Ë³Ê±Õë180¡ã´ÓP4µ½P3
-    eccPath.arcTo(m_pNewPan->Radius2Rect(m_ptEccR3.x(), m_ptEccR3.y(), m_dREcc),
-                  m_dChamferDegree+180.0,180.0);
+    //ä»åœ†å¼§çš„èµ·ç‚¹å¼€å§‹
+    eccPath.arcMoveTo(m_pNewPan->Radius2Rect(m_ptEccR1.x(), m_ptEccR1.y(), m_dEccR1),
+                      m_dEccDegree-90.0);
+    //é€†æ—¶é’ˆ180Â°
+    eccPath.arcTo(m_pNewPan->Radius2Rect(m_ptEccR1.x(), m_ptEccR1.y(), m_dEccR1),
+                  m_dEccDegree-90.0,180.0);
+    //éœ€è¦é¡ºæ—¶é’ˆå†…åœ†å¼§çš„åº¦æ•°dAngleÂ°ï¼Œæ‰èƒ½ä¸ä¸Šä¸ªåœ†å¼§é—­åˆï¼Œå› ä¸ºæ˜¯å†…åœ†å¼§
+    double dRadian=acos((m_dEccR2*m_dEccR2 + m_dEccR2*m_dEccR2 - 2*m_dEccR1*2*m_dEccR1)
+                        /(2*m_dEccR2*m_dEccR2));//ä¸‰è§’å½¢ä½™å¼¦å®šç†
+    double dAngle=dRadian/PI*180.0;
+    eccPath.arcTo(m_pNewPan->Radius2Rect(m_ptEccR2.x(), m_ptEccR2.y(), m_dEccR2),
+                  m_dEccDegree+dAngle/2.0,-dAngle);
     eccPath.closeSubpath();
-    m_pathEcc=eccPath;
-    //»­ÔËĞĞ¹ì¼£
+    m_path=eccPath;
+    //ç”»è¿è¡Œè½¨è¿¹
     CreateArc();
 }
 
 void NewCell::CreateArc()
 {
-    //ÔËĞĞ¹ì¼££¬ÖĞĞÄÖá¡¢Æ«ĞÄÖá¸ù¾İÅö×²´¦Àí½øĞĞÔËĞĞÕ¹¿ª
+    //è¿è¡Œè½¨è¿¹ï¼Œä¸­å¿ƒè½´ã€åå¿ƒè½´æ ¹æ®ç¢°æ’å¤„ç†è¿›è¡Œè¿è¡Œå±•å¼€
     QPainterPath arcPath;
     int nCenSlice=0;
     int nEccSlice=0;
-    QPointF ptFiber=QPointF(m_dCenterX,m_dCenterY);
+    QPointF ptFiber=QPointF(m_dCenterX-m_dMinR,m_dCenterY);
     arcPath.moveTo(m_pNewPan->Op2Vp(ptFiber));
     if(m_nRunStyle==RUN_COM)
-    {//Ò»°ãÔËĞĞ×´Ì¬
-        //µ±Ç°×Ü¹²ÔËĞĞµÄ»¡¶ÈÆ¬½øĞĞ·Ö¸î
+    {//ä¸€èˆ¬è¿è¡ŒçŠ¶æ€
+        //å½“å‰æ€»å…±è¿è¡Œçš„å¼§åº¦ç‰‡è¿›è¡Œåˆ†å‰²
         for( ;nCenSlice<=m_nCurrentCenSlice||nEccSlice<=m_nCurrentEccSlice;
             nCenSlice++,nEccSlice++)
         {
@@ -356,7 +315,7 @@ void NewCell::CreateArc()
         }
     }
     else if(m_nRunStyle==RUN_PLAN||m_nRunStyle==RUN_LAST)
-    {//´¦ÀíÅö×²×´Ì¬
+    {//å¤„ç†ç¢°æ’çŠ¶æ€
         for(int nC=0,nE=0;nC<m_nWavePos&&nE<m_nWavePos;nC++,nE++)
         {
             if(m_nCenWave[nC]!=BYTE_NULL)

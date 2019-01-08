@@ -589,10 +589,10 @@ void Pan::CheckIntersects()
             int nDistance=CellDistance(m_nRunID[i],j);
             if(nDistance==INT_SPACE)
             {
-                QPainterPath path1=m_pCell[m_nRunID[i]-1]->GetCenPath();
-                QPainterPath path2=m_pCell[m_nRunID[i]-1]->GetEccPath();
-                QPainterPath path3=m_pCell[j-1]->GetCenPath();
-                QPainterPath path4=m_pCell[j-1]->GetEccPath();
+                QPainterPath path1=CellCenPath(m_nRunID[i]);
+                QPainterPath path2=CellEccPath(m_nRunID[i]);
+                QPainterPath path3=CellCenPath(j);
+                QPainterPath path4=CellEccPath(j);
                 bool b1=path1.intersects(path4);
                 bool b2=path2.intersects(path3);
                 bool b3=path2.intersects(path4);
@@ -734,10 +734,10 @@ int Pan::DetectCollision(int nID, int mID)
     int nValue=0;
     CreateCellPath(nID);
     CreateCellPath(mID);
-    QPainterPath path1=m_pCell[nID-1]->GetCenPath();
-    QPainterPath path2=m_pCell[nID-1]->GetEccPath();
-    QPainterPath path3=m_pCell[mID-1]->GetCenPath();
-    QPainterPath path4=m_pCell[mID-1]->GetEccPath();
+    QPainterPath path1=CellCenPath(nID);
+    QPainterPath path2=CellEccPath(nID);
+    QPainterPath path3=CellCenPath(mID);
+    QPainterPath path4=CellEccPath(mID);
     bool b1=path1.intersects(path4);//n中心轴与m偏心轴
     bool b2=path2.intersects(path3);//n偏心轴与m中心轴
     bool b3=path2.intersects(path4);//n偏心轴与m偏心轴
@@ -894,7 +894,17 @@ void Pan::DealEccMethod(int nID, int mID, int nPos, int nBasis)
         break;
     //nID单元偏心轴扫过的区域与mID单元目标位置都碰撞
     case BASIS_CEC:
-        DealCen(nID,nPos);
+        if(CalCenSlice(mID,nPos)<CenTargetSlice(mID))
+        {
+            if(CalEccSlice(mID,nPos)>0)
+            {
+                DealEcc(mID,nPos);
+            }
+        }
+        else
+        {
+            DealCen(nID,nPos);
+        }
         break;
     default:
         break;

@@ -57,12 +57,12 @@ void Cell::InitCell(Pan *pPan, double dRadius, double dRadian)
 {
     m_pPan = pPan;
     m_dRunRadian = dRadian;
-    if(dRadius<=0)
+    if(dRadius<0)
     {
         m_dRadius =0;
         m_dStartRadian=acos(0);
     }
-    else if(dRadius>=2*m_dRunEcc)
+    else if(dRadius>2*m_dRunEcc)
     {
         m_dRadius=2*m_dRunEcc;
         m_dStartRadian=acos(1);
@@ -319,10 +319,10 @@ void Cell::CreatePath()
     //从圆弧的P2点开始
     eccPath.arcMoveTo(m_pPan->Radius2Rect(m_ptEccR1.x(), m_ptEccR1.y(), m_dREcc),
                       m_dChamferDegree);
-    //顺时针180°从P2到P1
+    //逆时针180°从P2到P1
     eccPath.arcTo(m_pPan->Radius2Rect(m_ptEccR1.x(), m_ptEccR1.y(), m_dREcc),
                   m_dChamferDegree,180.0);
-    //顺时针180°从P4到P3
+    //逆时针180°从P4到P3
     eccPath.arcTo(m_pPan->Radius2Rect(m_ptEccR3.x(), m_ptEccR3.y(), m_dREcc),
                   m_dChamferDegree+180.0,180.0);
     eccPath.closeSubpath();

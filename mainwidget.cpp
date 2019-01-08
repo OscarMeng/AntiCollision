@@ -17,16 +17,16 @@ MainWidget::MainWidget(QWidget *parent)
 
     m_pAntiStack=new QStackedWidget(this);
     m_pAntiStack->setFrameStyle(QFrame::Panel|QFrame::Raised);
-    m_pAntiStack->addWidget(m_pAntiArea);
     m_pAntiStack->addWidget(m_pNewAnti);
+    m_pAntiStack->addWidget(m_pAntiArea);
     m_pControlStack=new QStackedWidget(this);
     m_pControlStack->setFrameStyle(QFrame::Panel|QFrame::Raised);
-    m_pControlStack->addWidget(m_pCtrlWidget);
     m_pControlStack->addWidget(m_pNewControl);
+    m_pControlStack->addWidget(m_pCtrlWidget);
     m_pShapeStack=new QStackedWidget(this);
     m_pShapeStack->setFrameStyle(QFrame::Panel|QFrame::Raised);
-    m_pShapeStack->addWidget(m_pShapeWidget);
     m_pShapeStack->addWidget(m_pNewShape);
+    m_pShapeStack->addWidget(m_pShapeWidget);
 
     m_pCellType = new QMenu(tr("单元类型"));
     m_pOldAct = new QAction(tr("25.6mm单元"),this);
@@ -115,8 +115,8 @@ void MainWidget::SetUnitPos()
             output<<str<<endl;
             for(int i=0;i<int(sizeof(nCell)/sizeof(nCell[0]));i++)
             {
-                int nStart=400;
-                double dR=double(nStart+rand()%(1700-nStart))/100;            //展开后单元中心到光纤点距离半径0~17mm
+                int nStart=1600;
+                double dR=double(nStart+rand()%(4500-nStart))/100;            //展开后单元中心到光纤点距离半径0~17mm
                 double dA=double(rand()%36000)/100;                           //运行到的度数0~360°
                 str.sprintf("%-8d%-15f%-10f",nCell[i],dR,dA);
                 output<<str<<endl;

@@ -41,7 +41,7 @@ public:
 public:
     const double	    m_dRPan = 430.5;   			//焦面板半径
     const double        m_dMaxZoom = 20.0;          //最大放大倍数
-    const double        m_dMinZoom = 0.8;           //最小缩小倍数
+    const double        m_dMinZoom = 1.0;           //最小缩小倍数
     int	                m_nCellsX;	                //盘正X轴，根据单元坐标点调整
     int             	m_nCellsY;	                //盘正Y轴，根据单元坐标点调整
     int                 m_nRunID[NEW_NUM];          //运行的单元号
@@ -104,14 +104,13 @@ public:
     void    SetCellCenSlice(int nID,int nSlice);    //设置中心轴单元的度数
     void    SetCellEccSlice(int nID,int nSlice);    //设置偏心轴单元的度数
     void    SetCellEccRadius(int nID,double dRadius);//设置偏心轴单元半径
-    void    SetCellFinalValue(int nID, int nStyle=RUN_COM, double dEccR=MAX_RADIUS);
+    void    SetCellFinalValue(int nID, int nStyle=RUN_COM);//设置单元的最终状态值
     int     CellCenPosValue(int nID,int nPos);//某单元中心轴波形的某位置值
     int     CellEccPosValue(int nID,int nPos);//某单元中心轴波形的某位置值
     bool    CellRunStatus(int nID);           //某单元是否运行
     int     CellCenFinalPos(int nID);             //中心轴波形被赋值的最终位置值
     int     CellEccFinalPos(int nID);             //偏心轴波形被赋值的最终位置值
-    QPainterPath CellCenPath(int nID);            //单元中心轴外形
-    QPainterPath CellEccPath(int nID);            //单元偏心轴外形
+    QPainterPath CellPath(int nID);            //单元外形
 
     void    PlayRun();                 //一般运行
     void    PlayDeal();                //运行处理碰撞之后的波形
@@ -122,8 +121,8 @@ public:
 
     void    DealCellPos();             //处理单元位置
     void    DealSolution();            //碰撞检测处理
-    int     DetectCollision(int nID,int mID);            //检测碰撞并返回值
-    void    DealCollision(int nID, int mID ,int nPos ,int nResult);//处理碰撞
+    bool    DetectCollision(int nID,int mID);            //检测碰撞并返回值
+    void    DealCollision(int nID, int mID , int nPos);//处理碰撞
     void    DealCenMethod(int nID, int mID , int nPos);//处理中心轴方法
     void    DealEccMethod(int nID, int mID ,int nPos ,int nBasis);//处理偏心轴方法
     void    SolutionBasis();            //处理方案依据

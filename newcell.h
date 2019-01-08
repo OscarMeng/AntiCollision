@@ -22,34 +22,15 @@ public:
     int              m_nCenWave[WAVE_NUM];//中心轴运行的波形数据
     int              m_nEccWave[WAVE_NUM];//偏心轴运行的波形数据
 private:
-    const double m_dCen = 13;      //中心轴长度
-    const double m_dEcc = 13.5;    //偏心轴长度
-    const double m_dRunEcc = 8.5;  //偏心轴展开长度
-    double m_dREcc;                //偏心轴外倒角圆弧半径
-
-    QPointF m_ptCenP1;             //中心轴起始时4点
-    QPointF m_ptCenP2;             //中心轴起始时4点
-    QPointF m_ptCenP3;             //中心轴起始时4点
-    QPointF m_ptCenP4;             //中心轴起始时4点
-    double m_dLenghtP1;            //中心轴起始时4点相当于坐标原点（圆心）的长度
-    double m_dLenghtP2;            //中心轴起始时4点相当于坐标原点（圆心）的长度
-    double m_dLenghtP3;            //中心轴起始时4点相当于坐标原点（圆心）的长度
-    double m_dLenghtP4;            //中心轴起始时4点相当于坐标原点（圆心）的长度
-    double m_dRadianP1;            //中心轴起始时4点相当于坐标x轴的偏转弧度
-    double m_dRadianP2;            //中心轴起始时4点相当于坐标x轴的偏转弧度
-    double m_dRadianP3;            //中心轴起始时4点相当于坐标x轴的偏转弧度
-    double m_dRadianP4;            //中心轴起始时4点相当于坐标x轴的偏转弧度
-
-    QPointF m_ptEccP1;             //偏心轴外形矩形点
-    QPointF m_ptEccP2;             //偏心轴外形矩形点
-    QPointF m_ptEccP3;             //偏心轴外形矩形点
-    QPointF m_ptEccP4;             //偏心轴外形矩形点
+    const double m_dCen = 14.5;    //中心轴长度
+    const double m_dEcc = 30.5;    //偏心轴长度
+    const double m_dEccR1=1.55;    //偏心轴前端半圆圆弧半径
+    const double m_dEccR2=4.0;     //偏心轴后端圆弧半径
+    const double m_dMinR=16.0;     //单元旋转最小半径
+    const double m_dMaxR=45.0;     //单元旋转最大半径
     QPointF m_ptEccR1;             //偏心轴前端半圆中心点
     QPointF m_ptEccR2;             //偏心轴展开时旋转中心点
-    QPointF m_ptEccR3;             //偏心轴后端半圆中心点
-
-    QPainterPath m_pathCen;        //中心轴外形轨迹
-    QPainterPath m_pathEcc;        //偏心轴外形轨迹
+    QPainterPath m_path;           //偏心轴外形轮廓
     QPainterPath m_pathArc;        //运行的圆弧轨迹
 
 private:
@@ -66,7 +47,7 @@ private:
     int          m_nCenRadSlice;        //中心轴需要运行的弧度片，rad*100
     double       m_dEccRadian;          //偏心轴展开需要运行的弧度rad，相对于中心轴负方向
     int          m_nEccRadSlice;        //偏心轴展开需要运行的弧度片，rad*100
-    double       m_dChamferDegree;      //画偏心轴外倒角圆弧的起始度数°
+    double       m_dEccDegree;          //画偏心轴时，旋转的度数°
     int          m_nCurrentCenSlice;    //当前中心轴展开的弧度片，rad*100，相对于x轴正方向
     int          m_nCurrentEccSlice;    //当前偏心轴展开的弧度片，rad*100，相对于中心轴负方向
     int          m_nWavePos;            //轴波形位置
@@ -102,9 +83,8 @@ public:
     inline bool    GetRunStatus()                   {return m_bStatus;}
     inline double  GetRunRadian()                   {return m_dRunRadian;}
     inline void SetWavePos(int nWavePos)            {m_nWavePos=nWavePos;}
-    inline void SetEccRadius(double dRadius)        {m_dREcc=dRadius;}
-    inline QPainterPath GetCenPath()                {return m_pathCen;}
-    inline QPainterPath GetEccPath()                {return m_pathEcc;}
+    inline QPainterPath GetPath()                   {return m_path;}
+
 signals:
 
 public slots:

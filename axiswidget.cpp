@@ -19,7 +19,10 @@ AxisWidget::AxisWidget()
 
 AxisWidget::~AxisWidget()
 {
-    delete m_pPainter;
+    if(m_pPainter)
+    {
+//        delete m_pPainter;
+    }
 }
 
 void AxisWidget::paintEvent(QPaintEvent *e)

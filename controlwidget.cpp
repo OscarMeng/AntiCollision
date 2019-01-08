@@ -8,7 +8,7 @@ ControlWidget::ControlWidget(Pan *pPan) : m_pPan(pPan)
 
     m_pFilePath=new QLabel(tr("文件路径:"));
     m_pLineText=new QLineEdit;
-    m_sFilePath="E:/QAntiCollision/File/OldUnit/CheckCenter.txt";
+    m_sFilePath="E:/QAntiCollision/File/NewUnit/CheckCenter.txt";
     m_pLineText->setText(m_sFilePath);
     m_pOpen=new QPushButton(tr("打开"));
     connect(m_pOpen,SIGNAL(clicked()),this,SLOT(OpenFile()));
