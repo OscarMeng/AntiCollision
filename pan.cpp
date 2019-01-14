@@ -372,17 +372,19 @@ void Pan::SetCellEccSlice(int nID, int nSlice)
     m_pCell[nID-1]->SetCurrentEccSlice(nSlice);
 }
 
-void Pan::SetCellEccRadius(int nID, double dRadius)
+void Pan::SetCellArc()
 {
-    m_pCell[nID-1]->SetEccRadius(dRadius);
+    for(int i=0;i<m_nRunNum;i++)
+    {
+        m_pCell[m_nRunID[i]-1]->CreateArc();
+    }
 }
 
-void Pan::SetCellFinalValue(int nID,int nStyle,double dEccR)
+void Pan::SetCellFinalValue(int nID, int nStyle)
 {
     SetCellCenSlice(nID,CenTargetSlice(nID));
     SetCellEccSlice(nID,EccTargetSlice(nID));
     SetCellRunStyle(nID,nStyle);
-    SetCellEccRadius(nID,dEccR);
 }
 
 int Pan::CellCenPosValue(int nID, int nPos)
@@ -413,6 +415,7 @@ void Pan::PlayRun()
     case 0:
         m_nSliceIndex++;
         m_nPlayIndex++;
+        m_nUpdateIndex++;
         m_bRunEnd=true;//每次都进行假设运行完成
         break;
     case 1:
@@ -425,6 +428,8 @@ void Pan::PlayRun()
             m_nPlayIndex=0;
             m_bRunStatus=false;
             m_nRunMode=RUN_NULL;
+            SetCellArc();
+            m_pPaintArea->update();
             emit ShowText("运行完成！");
             return;
         }
@@ -464,7 +469,12 @@ void Pan::PlayRun()
         break;
     case 6:
         m_nPlayIndex=0;
-        m_pPaintArea->update();
+        if(m_nUpdateIndex==10)
+        {
+            m_nUpdateIndex=0;
+            SetCellArc();
+            m_pPaintArea->update();
+        }
         break;
     default:
         return;
@@ -480,6 +490,7 @@ void Pan::PlayDeal()
     case 0:
         m_nPosIndex++;
         m_nPlayIndex++;
+        m_nUpdateIndex++;
     case 1:
         if(m_nPosIndex<=m_nCellWavePos)
         {
@@ -487,7 +498,6 @@ void Pan::PlayDeal()
             {
                 SetCellWavePos(i,m_nPosIndex);
                 SetCellRunStyle(i,RUN_LAST);
-                SetCellEccRadius(i,MIN_RADIUS);
                 CreateCellPath(i);
             }
         }
@@ -497,6 +507,8 @@ void Pan::PlayDeal()
             m_nPlayIndex=0;
             m_bRunStatus=false;
             m_nRunMode=RUN_NULL;
+            SetCellArc();
+            m_pPaintArea->update();
             emit ShowText("运行结束！");
             return;
         }
@@ -529,7 +541,12 @@ void Pan::PlayDeal()
             m_nPlayIndex++;
         }
     case 5:
-        m_pPaintArea->update();
+        if(m_nUpdateIndex==10)
+        {
+            m_nUpdateIndex=0;
+            SetCellArc();
+            m_pPaintArea->update();
+        }
         m_nPlayIndex++;
     case 6:
         m_nPlayIndex=0;
@@ -573,7 +590,6 @@ void Pan::RunCellValue()
             }
         }
         SetCellRunStyle(i,RUN_COM);
-        SetCellEccRadius(i,MAX_RADIUS);
         CreateCellPath(i);
     }
 }
@@ -629,6 +645,8 @@ void Pan::PlaySolution()
         m_nCellWavePos++;
         m_nPlayIndex++;
         m_bDealEnd=true;
+        m_nProgressIndex++;
+        m_nUpdateIndex++;
     case 1:
         if(m_nCellWavePos>WAVE_NUM)
         {
@@ -641,7 +659,11 @@ void Pan::PlaySolution()
         m_nPlayIndex++;
     case 2:
         DealCellPos();
-        emit DealProgress();
+        if(m_nProgressIndex==10)
+        {
+            m_nProgressIndex=0;
+            emit DealProgress();
+        }
         m_nPlayIndex++;
     case 3:
         if(m_bDealEnd)
@@ -649,6 +671,9 @@ void Pan::PlaySolution()
             m_nPlayIndex=0;
             m_bRunStatus=false;
             m_nRunMode=RUN_NULL;
+            SetCellArc();
+            m_pPaintArea->update();
+            emit DealProgress();
             emit ShowText("处理完成！");
             return;
         }
@@ -681,7 +706,12 @@ void Pan::PlaySolution()
             m_nPlayIndex++;
         }
     case 6:
-        m_pPaintArea->update();
+        if(m_nUpdateIndex==10)
+        {
+            m_nUpdateIndex=0;
+            SetCellArc();
+            m_pPaintArea->update();
+        }
         m_nPlayIndex++;
     case 7:
         m_nPlayIndex=0;
@@ -724,36 +754,27 @@ void Pan::DealCellPos()
         }
         SetCellWavePos(i,m_nCellWavePos);
         SetCellRunStyle(i,RUN_PLAN);
-        SetCellEccRadius(i,MAX_RADIUS);
         CreateCellPath(i);
     }
 }
 
-int Pan::DetectCollision(int nID, int mID)
+bool Pan::DetectCollision(int nID, int mID, bool* bCE)
 {
-    int nValue=0;
+    bool bValue=false;
     CreateCellPath(nID);
     CreateCellPath(mID);
     QPainterPath path1=CellCenPath(nID);
     QPainterPath path2=CellEccPath(nID);
     QPainterPath path3=CellCenPath(mID);
     QPainterPath path4=CellEccPath(mID);
-    bool b1=path1.intersects(path4);//n中心轴与m偏心轴
-    bool b2=path2.intersects(path3);//n偏心轴与m中心轴
-    bool b3=path2.intersects(path4);//n偏心轴与m偏心轴
-    if(b1)
+    bCE[0]=path1.intersects(path4);//n中心轴与m偏心轴
+    bCE[1]=path2.intersects(path3);//n偏心轴与m中心轴
+    bCE[2]=path2.intersects(path4);//n偏心轴与m偏心轴
+    if(bCE[0]||bCE[1]||bCE[2])
     {
-        nValue+=100;
+        bValue=true;
     }
-    if(b2)
-    {
-        nValue+=10;
-    }
-    if(b3)
-    {
-        nValue+=1;
-    }
-    return nValue;
+    return bValue;
 }
 
 void Pan::DealSolution()
@@ -765,11 +786,21 @@ void Pan::DealSolution()
             int nDistance=CellDistance(m_nRunID[i],j);
             if(nDistance==INT_SPACE)
             {
-                int nResult=0;
                 bool bDeal=false;
-                while(nResult=DetectCollision(m_nRunID[i],j))
+                bool bCE[3]={false,false,false};
+//                if(nResult=DetectCollision(m_nRunID[i],j))
+//                {
+//                    DealCollision(m_nRunID[i],j,m_nCellWavePos,nResult);
+//                    bDeal=true;
+//                }
+//                if(bDeal)
+//                {
+//                   m_nCellWavePos=0;
+//                   return;
+//                }
+                while(DetectCollision(m_nRunID[i],j,bCE))
                 {
-                    DealCollision(m_nRunID[i],j,m_nCellWavePos,nResult);
+                    DealCollision(m_nRunID[i],j,m_nCellWavePos,bCE);
                     bDeal=true;
                 }
                 if(bDeal)
@@ -781,20 +812,20 @@ void Pan::DealSolution()
     }
 }
 
-void Pan::DealCollision(int nID, int mID, int nPos, int nResult)
+void Pan::DealCollision(int nID, int mID, int nPos, bool* bCE)
 {
-    int nCE=nResult/100;     //n中心轴与m偏心轴相碰，偏心轴一定是展开的
-    int nEC=nResult%100/10;  //n偏心轴与m中心轴相碰，偏心轴一定是展开的
-    int nEE=nResult%10;      //n偏心轴与m偏心轴相碰，偏心轴至少有一个是展开的
-    if(nCE)
+    //n中心轴与m偏心轴相碰，偏心轴一定是展开的
+    //n偏心轴与m中心轴相碰，偏心轴一定是展开的
+    //n偏心轴与m偏心轴相碰，偏心轴至少有一个是展开的
+    if(bCE[0])
     {
         DealCenMethod(nID,mID,nPos);
     }
-    if(nEC)
+    if(bCE[1])
     {
         DealCenMethod(mID,nID,nPos);
     }
-    if(nEE)
+    if(bCE[2])
     {
         int nBasis=m_mapResult[QString::number(nID,10)+QString::number(mID,10)];
         int mBasis=m_mapResult[QString::number(mID,10)+QString::number(nID,10)];
@@ -994,11 +1025,11 @@ void Pan::DealEachPos(int nID, int mID, int nPos)
     {
         SetCellWavePos(nID,i);
         SetCellWavePos(mID,i);
-        int nResult=0;
         bool bDeal=false;
-        while(nResult=DetectCollision(nID,mID))
+        bool bCE[3]={false,false,false};
+        while(DetectCollision(nID,mID,bCE))
         {
-            DealCollision(nID,mID,i,nResult);
+            DealCollision(nID,mID,i,bCE);
             bDeal=true;
         }
         if(bDeal)
@@ -1140,6 +1171,7 @@ void Pan::CommonRun()
     killTimer(m_nLastTimerID);
     m_nPlayIndex=0;
     m_nSliceIndex=0;
+    m_nUpdateIndex=0;
     m_bRunStatus=true;
     m_nRunMode=RUN_COM;
     m_nComTimerID=this->startTimer(RUN_TIME);
@@ -1212,7 +1244,6 @@ void Pan::ResetRun()
         SetCellCenSlice(m_nRunID[i],0);
         SetCellEccSlice(m_nRunID[i],0);
         SetCellRunStyle(m_nRunID[i],RUN_COM);
-        SetCellEccRadius(m_nRunID[i],MAX_RADIUS);
     }
     m_pPaintArea->update();
 }
@@ -1237,19 +1268,17 @@ void Pan::DealRandom()
             {
                 SetCellFinalValue(m_nRunID[i]);
                 SetCellFinalValue(j);
-                int nResult=DetectCollision(m_nRunID[i],j);
-                int nCE=nResult/100;                       //n中心轴与m偏心轴相碰，偏心轴一定是展开的
-                int nEC=nResult%100/10;                    //n偏心轴与m中心轴相碰，偏心轴一定是展开的
-                int nEE=nResult%10;                        //n偏心轴与m偏心轴相碰，偏心轴至少有一个是展开的
-                if(nCE)
+                bool bCE[3]={false,false,false};
+                DetectCollision(m_nRunID[i],j,bCE);
+                if(bCE[0])
                 {
                     ResetCell(j);
                 }
-                else if(nEC)
+                else if(bCE[1])
                 {
                     ResetCell(m_nRunID[i]);
                 }
-                else if(nEE)
+                else if(bCE[2])
                 {
                     if(m_bDealRuned[j-1])
                     {
@@ -1310,7 +1339,7 @@ void Pan::DealRandom()
                         ResetCell(j, RUN_STATUS, jR, jRad);
                         SetCellFinalValue(m_nRunID[i]);
                         SetCellFinalValue(j);
-                        if(DetectCollision(m_nRunID[i],j))
+                        if(DetectCollision(m_nRunID[i],j,bCE))
                         {
                             ResetCell(j, RUN_STATUS, jRadius, jRadian);
                             ResetCell(m_nRunID[i]);
@@ -1367,13 +1396,36 @@ void Pan::PlanRun()
     killTimer(m_nLastTimerID);
     m_nPlayIndex=0;
     m_nCellWavePos=0;
+    m_nProgressIndex=0;
+    m_nUpdateIndex=0;
     m_bRunStatus=true;
     m_nRunMode=RUN_PLAN;
     for(int j=0;j<m_nRunNum;j++)
     {
         m_bDealRuned[m_nRunID[j]-1] = false;
     }
+//    m_nCellWavePos=700;
+//    QTime time;
+//    time.start();
+//    DealCellPos();
+//    int n=time.elapsed();
+
+//    time.start();
+//    DealSolution();
+//    n=time.elapsed();
+
+
+//    time.start();
+//    CreateCellPath(18);
+//    n=time.elapsed();
+
+
+//    time.start();
+//    DetectCollision(17,18);
+//    n=time.elapsed();
+//    m_nCellWavePos=100;
     m_nPlanTimerID=this->startTimer(RUN_TIME);
+//    PlaySolution();
 }
 
 void Pan::LastRun()
@@ -1383,6 +1435,7 @@ void Pan::LastRun()
     killTimer(m_nLastTimerID);
     m_nPlayIndex=0;
     m_nPosIndex=0;
+    m_nUpdateIndex=0;
     m_bRunStatus=true;
     m_nRunMode=RUN_LAST;
     m_nLastTimerID=this->startTimer(RUN_TIME);

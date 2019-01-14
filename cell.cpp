@@ -20,15 +20,10 @@ Cell::Cell(int nID, bool bStatus, double dCenterX, double dCenterY)
     m_nRunRadSlice=0;
     m_nWavePos=0;
     m_nRunStyle=RUN_COM;//一般运行方式
-    m_dREcc=MAX_RADIUS; //偏心轴半径最大
     m_ptCenP1=QPointF(-2.75,-3.9);
     m_ptCenP2=QPointF(-2.75,-6.9);
     m_ptCenP3=QPointF(10.25,-6.9);
     m_ptCenP4=QPointF(10.25,-3.9);
-    m_ptEccP1=QPointF(0,0);
-    m_ptEccP2=QPointF(0,0);
-    m_ptEccP3=QPointF(0,0);
-    m_ptEccP4=QPointF(0,0);
     m_ptEccR1=QPointF(0,0);
     m_ptEccR2=QPointF(0,0);
     m_ptEccR3=QPointF(0,0);
@@ -260,7 +255,7 @@ void Cell::CreatePoint()
     m_ptCenP4=QPointF(m_dCenterX+m_dLenghtP4*cos(dPA4),m_dCenterY-m_dLenghtP4*sin(dPA4));
 
     //偏心轴外形矩形4点，中心3点
-    double dCenDistance=m_dEcc-2*m_dREcc-m_dRunEcc;
+    double dCenDistance=m_dEcc-2*m_dEccR-m_dRunEcc;
     m_ptEccR1=CalPointBySlice(m_nCurrentCenSlice,m_nCurrentEccSlice);
     m_ptEccR2=QPointF(m_dCenterX+m_dRunEcc*cos(dCenRadian),
                       m_dCenterY-m_dRunEcc*sin(dCenRadian));
@@ -292,14 +287,6 @@ void Cell::CreatePoint()
     m_dChamferDegree=dChamferRadian/PI*180.0;
     m_ptEccR3=QPointF(m_ptEccR2.x()-dCenDistance*cos(dEccRadian),
                       m_ptEccR2.y()+dCenDistance*sin(dEccRadian));
-    m_ptEccP1=QPointF(m_ptEccR1.x()-m_dREcc*cos(dChamferRadian),
-                      m_ptEccR1.y()+m_dREcc*sin(dChamferRadian));
-    m_ptEccP2=QPointF(m_ptEccR1.x()+m_dREcc*cos(dChamferRadian),
-                      m_ptEccR1.y()-m_dREcc*sin(dChamferRadian));
-    m_ptEccP3=QPointF(m_ptEccR3.x()+m_dREcc*cos(dChamferRadian),
-                      m_ptEccR3.y()-m_dREcc*sin(dChamferRadian));
-    m_ptEccP4=QPointF(m_ptEccR3.x()-m_dREcc*cos(dChamferRadian),
-                      m_ptEccR3.y()+m_dREcc*sin(dChamferRadian));
 }
 
 void Cell::CreatePath()
@@ -317,22 +304,21 @@ void Cell::CreatePath()
     QPainterPath eccPath;
     //方向为P2,P1,P4,P3
     //从圆弧的P2点开始
-    eccPath.arcMoveTo(m_pPan->Radius2Rect(m_ptEccR1.x(), m_ptEccR1.y(), m_dREcc),
+    eccPath.arcMoveTo(m_pPan->Radius2Rect(m_ptEccR1.x(), m_ptEccR1.y(), m_dEccR),
                       m_dChamferDegree);
     //逆时针180°从P2到P1
-    eccPath.arcTo(m_pPan->Radius2Rect(m_ptEccR1.x(), m_ptEccR1.y(), m_dREcc),
+    eccPath.arcTo(m_pPan->Radius2Rect(m_ptEccR1.x(), m_ptEccR1.y(), m_dEccR),
                   m_dChamferDegree,180.0);
     //逆时针180°从P4到P3
-    eccPath.arcTo(m_pPan->Radius2Rect(m_ptEccR3.x(), m_ptEccR3.y(), m_dREcc),
+    eccPath.arcTo(m_pPan->Radius2Rect(m_ptEccR3.x(), m_ptEccR3.y(), m_dEccR),
                   m_dChamferDegree+180.0,180.0);
     eccPath.closeSubpath();
     m_pathEcc=eccPath;
-    //画运行轨迹
-    CreateArc();
 }
 
 void Cell::CreateArc()
 {
+    //运行的单元才有
     //运行轨迹，中心轴、偏心轴根据碰撞处理进行运行展开
     QPainterPath arcPath;
     int nCenSlice=0;

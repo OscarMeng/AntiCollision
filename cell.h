@@ -25,7 +25,7 @@ private:
     const double m_dCen = 13;      //中心轴长度
     const double m_dEcc = 13.5;    //偏心轴长度
     const double m_dRunEcc = 8.25; //偏心轴展开长度
-    double m_dREcc;                //偏心轴外倒角圆弧半径
+    const double m_dEccR = 2.1;    //偏心轴外倒角圆弧半径
 
     QPointF m_ptCenP1;             //中心轴起始时4点
     QPointF m_ptCenP2;             //中心轴起始时4点
@@ -39,11 +39,6 @@ private:
     double m_dRadianP2;            //中心轴起始时4点相当于坐标x轴的偏转弧度
     double m_dRadianP3;            //中心轴起始时4点相当于坐标x轴的偏转弧度
     double m_dRadianP4;            //中心轴起始时4点相当于坐标x轴的偏转弧度
-
-    QPointF m_ptEccP1;             //偏心轴外形矩形点
-    QPointF m_ptEccP2;             //偏心轴外形矩形点
-    QPointF m_ptEccP3;             //偏心轴外形矩形点
-    QPointF m_ptEccP4;             //偏心轴外形矩形点
     QPointF m_ptEccR1;             //偏心轴前端半圆中心点
     QPointF m_ptEccR2;             //偏心轴展开时旋转中心点
     QPointF m_ptEccR3;             //偏心轴后端半圆中心点
@@ -102,7 +97,6 @@ public:
     inline bool    GetRunStatus()                   {return m_bStatus;}
     inline double  GetRunRadian()                   {return m_dRunRadian;}
     inline void SetWavePos(int nWavePos)            {m_nWavePos=nWavePos;}
-    inline void SetEccRadius(double dRadius)        {m_dREcc=dRadius;}
     inline QPainterPath GetCenPath()                {return m_pathCen;}
     inline QPainterPath GetEccPath()                {return m_pathEcc;}
 signals:

@@ -17,16 +17,16 @@ MainWidget::MainWidget(QWidget *parent)
 
     m_pAntiStack=new QStackedWidget(this);
     m_pAntiStack->setFrameStyle(QFrame::Panel|QFrame::Raised);
-    m_pAntiStack->addWidget(m_pNewAnti);
     m_pAntiStack->addWidget(m_pAntiArea);
+    m_pAntiStack->addWidget(m_pNewAnti);
     m_pControlStack=new QStackedWidget(this);
     m_pControlStack->setFrameStyle(QFrame::Panel|QFrame::Raised);
-    m_pControlStack->addWidget(m_pNewControl);
     m_pControlStack->addWidget(m_pCtrlWidget);
+    m_pControlStack->addWidget(m_pNewControl);
     m_pShapeStack=new QStackedWidget(this);
     m_pShapeStack->setFrameStyle(QFrame::Panel|QFrame::Raised);
-    m_pShapeStack->addWidget(m_pNewShape);
     m_pShapeStack->addWidget(m_pShapeWidget);
+    m_pShapeStack->addWidget(m_pNewShape);
 
     m_pCellType = new QMenu(tr("单元类型"));
     m_pOldAct = new QAction(tr("25.6mm单元"),this);
