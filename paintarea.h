@@ -6,6 +6,10 @@
 #include <QMouseEvent>
 #include <QResizeEvent>
 #include <QPainter>
+#include <QColor>
+#include <QPixmap>
+#include <QPoint>
+#include <QPalette>
 #include "anticollisionarea.h"
 #include "pan.h"
 #include "cell.h"
@@ -32,11 +36,13 @@ public:
 public:
     AntiCollisionArea* m_pAntiArea;
     Pan*      m_pPan;
+    QPixmap*  m_pPixmap;
     QPainter* m_pPainter;
+    QPoint    m_ptPress;
     int       m_nWidth;
     int       m_nHeight;
-    QPoint    m_ptPress;
     int       m_nFlag;
+    bool      m_bZoom;
 signals:
 
 public slots:

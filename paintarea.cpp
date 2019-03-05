@@ -3,7 +3,7 @@
 PaintArea::PaintArea(AntiCollisionArea* pAntiArea, int nWidth, int nHeight)
 :m_pAntiArea(pAntiArea),m_nWidth(nWidth),m_nHeight(nHeight)
 {
-    setPalette(QPalette(Qt:: black));
+    setPalette(QPalette(Qt:: white));
     setAutoFillBackground(true);
     setMinimumSize(nWidth,nHeight);
     InitArea();
@@ -11,10 +11,20 @@ PaintArea::PaintArea(AntiCollisionArea* pAntiArea, int nWidth, int nHeight)
 
 PaintArea::~PaintArea()
 {
+    delete m_pPixmap;
     delete m_pPan;
 }
 
 //e没有用到也不能去除，否则不显示画面
+void PaintArea::InitArea()
+{
+    m_pPainter=new QPainter;
+    m_pPixmap=new QPixmap(size());
+    m_pPan=new Pan(this,m_nWidth,m_nHeight);//new时还没有生成m_pPainter
+    m_pPan->SetPainter(m_pPainter);
+    m_bZoom=false;
+}
+
 void PaintArea::paintEvent(QPaintEvent *e)
 {
     m_pPainter=new QPainter(this);//必须在此函数中进行，否则无法绘画,在QScrollArea中用viewport()
@@ -23,12 +33,21 @@ void PaintArea::paintEvent(QPaintEvent *e)
     m_pPainter->begin(this);
     m_pPan->Draw();
     m_pPainter->end();
+
+//    QPixmap *clearPix =new QPixmap(size());
+//    m_pPixmap = clearPix;
+//    QPainter *clearPaint=new QPainter;
+//    m_pPainter=clearPaint;
+//    m_pPan->SetPainter(m_pPainter);
+//    m_pPainter->begin(m_pPixmap);
+//    m_pPan->Draw();
+//    m_pPainter->end();
+
+//    QPainter painter(this);
+//    painter.setRenderHint(QPainter::SmoothPixmapTransform,true);//Pixmap反走样
+//    painter.drawPixmap(QPoint(0,0),*m_pPixmap);
 }
 
-void PaintArea::InitArea()
-{
-    m_pPan=new Pan(this,m_nWidth,m_nHeight);//new时还没有生成m_pPainter
-}
 
 void PaintArea::ZoomInOut(double dZoom, QPoint ptMain)
 {

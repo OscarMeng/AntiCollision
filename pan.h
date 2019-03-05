@@ -42,8 +42,8 @@ public:
 public:
     const double	    m_dRPan = 230;   			//焦面板半径
     const double	    m_dRPanCenter = 28;		    //焦面板中心孔半径
-    const double        m_dMaxZoom = 20;            //最大放大倍数
-    const double        m_dMinZoom = 1;             //最小缩小倍数
+    const double        m_dMaxZoom = 20.0;            //最大放大倍数
+    const double        m_dMinZoom = 1.0;             //最小缩小倍数
     int	                m_nCellsX;	                //盘正X轴，根据单元坐标点调整
     int             	m_nCellsY;	                //盘正Y轴，根据单元坐标点调整
     int                 m_nRunID[CELL_NUM];         //运行的单元号
@@ -129,7 +129,7 @@ public:
     bool    DetectCollision(int nID,int mID,bool* bCE);            //检测碰撞并返回值
     void    DealCollision(int nID, int mID ,int nPos ,bool* bCE);//处理碰撞
     void    DealCenMethod(int nID, int mID , int nPos);//处理中心轴方法
-    void    DealEccMethod(int nID, int mID ,int nPos ,int nBasis);//处理偏心轴方法
+    void    DealEccMethod(int nID, int mID , int nPos );//处理偏心轴方法
     void    SolutionBasis();            //处理方案依据
     int     DealBasis(int nID, int mID);//判定处理方式的依据,nID单元偏心轴转动与mID目标位置的碰撞情况
     void    DealNearCell(int nID,int mID, int nPos);          //处理周边单元的每个位置是否碰撞

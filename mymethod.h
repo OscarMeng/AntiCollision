@@ -35,7 +35,7 @@
 #define RUN_PLAN     2             //处理运行
 #define RUN_LAST     3             //结果运行
 
-#define COLOR_AMOUNT 9
+#define COLOR_AMOUNT 12
 #define COLOR_NUM    0
 #define COLOR_BREAK  1
 #define COLOR_RUN    2
@@ -45,6 +45,8 @@
 #define COLOR_TARGET 6
 #define COLOR_BORDER 7
 #define COLOR_SHAFT  8
-
+#define COLOR_CFILL  9
+#define COLOR_EFILL  10
+#define COLOR_CENTER 11
 
 #endif // MYMETHOD_H

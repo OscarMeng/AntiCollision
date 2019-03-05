@@ -69,6 +69,7 @@ private:
 public:
     void    InitCell(Pan* pPan, double dRadius, double dRadian);
     QRect   CalRect(double dX,double dY,double dR);
+    QRect   CalRect(QPointF ptPoint,double dR);
     void    Draw();
     void    DrawArc();//运行半径小于中心轴m_dCen+偏心轴m_dEcc，运行要到达的角度从x正轴开始，小于等于2*PI
     void    DrawCenEcc();//画中心轴和偏心轴

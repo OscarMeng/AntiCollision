@@ -113,14 +113,21 @@ QRect Cell::CalRect(double dX,double dY,double dR)
     return m_pPan->Radius2Rect(dX, dY, dR);
 }
 
+QRect Cell::CalRect(QPointF ptPoint, double dR)
+{
+    double dX=ptPoint.x();
+    double dY=ptPoint.y();
+    return m_pPan->Radius2Rect(dX, dY, dR);
+}
+
 
 void Cell::Draw()
 {
     //画圆
     if(m_bStatus)
     {
-        DrawArc();//画运行轨迹
         DrawCenEcc();//画展开的中心轴和偏心轴
+        DrawArc();//画运行轨迹
         DrawTargetPos();//画目标点
     }
     else
@@ -130,11 +137,11 @@ void Cell::Draw()
         DrawUnexpanded();
     }
     //写单元数
-    m_pPainter->setPen(*(m_pPan->m_pSolidPen[COLOR_NUM]));
-    QFont font;
-    font.setPointSize(10);
-    m_pPainter->setFont(font);
-    m_pPainter->drawText(CalRect(m_dCenterX,m_dCenterY,STOP_RADIUS),Qt::AlignCenter,QString::number(m_nID,10));
+//    m_pPainter->setPen(*(m_pPan->m_pSolidPen[COLOR_NUM]));
+//    QFont font;
+//    font.setPointSize(10);
+//    m_pPainter->setFont(font);
+//    m_pPainter->drawText(CalRect(m_dCenterX,m_dCenterY,STOP_RADIUS),Qt::AlignCenter,QString::number(m_nID,10));
 }
 
 void Cell::DrawArc()
@@ -142,6 +149,18 @@ void Cell::DrawArc()
     //画最后的落点所在的圆
     m_pPainter->setPen(*(m_pPan->m_pSolidPen[COLOR_CIRCLE]));
     m_pPainter->drawArc(m_rRect,0,360*16);
+    //画各中心圆
+    m_pPainter->setPen(*(m_pPan->m_pSolidPen[COLOR_CENTER]));
+    m_pPainter->drawArc(CalRect(m_dCenterX,m_dCenterY,0.5),0,360*16);
+    m_pPainter->drawArc(CalRect(m_ptEccR1,1.25),0,360*16);
+    m_pPainter->drawArc(CalRect(m_ptEccR2,1.1),0,360*16);
+
+    QPainterPath path;
+    path.arcMoveTo(CalRect(m_ptEccR1,0.5),0);
+    path.arcTo(CalRect(m_ptEccR1,0.5),0,360.0);
+    path.closeSubpath();
+    m_pPainter->drawPath(path);
+    m_pPainter->fillPath(path,*(m_pPan->m_bBrush[COLOR_RUN]));
     //画运行的轨迹
     m_pPainter->setPen(*(m_pPan->m_pSolidPen[COLOR_RUN]));
     m_pPainter->drawPath(m_pathArc);
@@ -149,15 +168,16 @@ void Cell::DrawArc()
 
 void Cell::DrawCenEcc()
 {
-    //展开痕迹
-    m_pPainter->setPen(*(m_pPan->m_pDddPen[COLOR_COORD]));
-    m_pPainter->drawLine(m_pPan->Op2Vp(m_dCenterX,m_dCenterY),m_pPan->Op2Vp(m_ptEccR2));
-    m_pPainter->drawLine(m_pPan->Op2Vp(m_ptEccR2),m_pPan->Op2Vp(m_ptEccR1));
-
     //中心轴外形    偏心轴外形
     m_pPainter->setPen(*(m_pPan->m_pSolidPen[COLOR_SHAFT]));
     m_pPainter->drawPath(m_pathCen);
     m_pPainter->drawPath(m_pathEcc);
+    m_pPainter->fillPath(m_pathCen,*(m_pPan->m_bBrush[COLOR_CFILL]));
+    m_pPainter->fillPath(m_pathEcc,*(m_pPan->m_bBrush[COLOR_EFILL]));
+    //展开痕迹
+    m_pPainter->setPen(*(m_pPan->m_pDddPen[COLOR_COORD]));
+    m_pPainter->drawLine(m_pPan->Op2Vp(m_dCenterX,m_dCenterY),m_pPan->Op2Vp(m_ptEccR2));
+    m_pPainter->drawLine(m_pPan->Op2Vp(m_ptEccR2),m_pPan->Op2Vp(m_ptEccR1));
 }
 
 void Cell::DrawUnexpanded()

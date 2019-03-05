@@ -94,15 +94,18 @@ QColor Pan::GetDefinedColor(int n)
     QColor col;
     switch (n)
     {
-    case COLOR_NUM:	    col = QColor(255, 255, 255);	break;//白色单元号颜色
-    case COLOR_BREAK:	col = QColor(255, 0, 0);		break;//红色单元碰撞区域颜色
-    case COLOR_RUN:	    col = QColor(0, 225, 0);	    break;//绿色单元运行过的路径颜色
-    case COLOR_COORD:	col = QColor(180, 0, 0);        break;//浅红色坐标轴颜色
-    case COLOR_DISUSE:	col = QColor(50, 50, 50);	    break;//浅灰色不展开单元轴外形
-    case COLOR_CIRCLE:	col = QColor(80, 80, 80);       break;//浅灰色单元展开最外圆
-    case COLOR_TARGET:	col = QColor(245, 255, 110);	break;//浅黄色目标点
-    case COLOR_BORDER:	col = QColor(0, 0, 255);    	break;//蓝色边界
-    case COLOR_SHAFT:   col = QColor(235,170,255);      break;//浅紫色运行轴外形
+    case COLOR_NUM:	    col = QColor(0, 0, 0);	        break;//单元号颜色
+    case COLOR_BREAK:	col = QColor(255, 0, 0);		break;//单元碰撞区域颜色
+    case COLOR_RUN:	    col = QColor(0, 255, 0);	    break;//单元运行过的路径颜色
+    case COLOR_COORD:	col = QColor(180, 0, 0);        break;//坐标轴颜色
+    case COLOR_DISUSE:	col = QColor(230, 230, 230);	break;//不展开单元轴外形
+    case COLOR_CIRCLE:	col = QColor(200, 200, 200);    break;//单元展开最外圆
+    case COLOR_TARGET:	col = QColor(0, 0, 110);    	break;//浅黄色目标点
+    case COLOR_BORDER:	col = QColor(0, 0, 100);     	break;//边界
+    case COLOR_SHAFT:   col = QColor(0,0,0);            break;//运行轴外形
+    case COLOR_CFILL:   col = QColor(255,235,210);      break;//中心轴填充
+    case COLOR_EFILL:   col = QColor(210,225,255);      break;//偏心轴填充
+    case COLOR_CENTER:  col = QColor(160,160,160);      break;//偏心轴填充
 
     default:			col = QColor(192, 192, 192);
     }
@@ -232,6 +235,7 @@ QRect Pan::Radius2Rect(double dx, double dy, double dR)
 void Pan::Draw()
 {
     //不运行，不处理，区域放大移动时，创建单元
+    m_pPainter->setRenderHint(QPainter::Antialiasing,true);//反走样
     if(!m_bRunStatus)
     {
         for (int i = 1; i <= CELL_NUM;i++)
@@ -788,16 +792,6 @@ void Pan::DealSolution()
             {
                 bool bDeal=false;
                 bool bCE[3]={false,false,false};
-//                if(nResult=DetectCollision(m_nRunID[i],j))
-//                {
-//                    DealCollision(m_nRunID[i],j,m_nCellWavePos,nResult);
-//                    bDeal=true;
-//                }
-//                if(bDeal)
-//                {
-//                   m_nCellWavePos=0;
-//                   return;
-//                }
                 while(DetectCollision(m_nRunID[i],j,bCE))
                 {
                     DealCollision(m_nRunID[i],j,m_nCellWavePos,bCE);
@@ -827,28 +821,26 @@ void Pan::DealCollision(int nID, int mID, int nPos, bool* bCE)
     }
     if(bCE[2])
     {
-        int nBasis=m_mapResult[QString::number(nID,10)+QString::number(mID,10)];
-        int mBasis=m_mapResult[QString::number(mID,10)+QString::number(nID,10)];
         //nID已到达过目标位置，mID未到达过目标位置
         if(m_bDealRuned[nID-1]&&!m_bDealRuned[mID-1])
         {
-            DealEccMethod(nID,mID,nPos,nBasis);
+            DealEccMethod(nID,mID,nPos);
         }
         //mID已到达过目标位置，nID未到达过目标位置
         else if(m_bDealRuned[mID-1]&&!m_bDealRuned[nID-1])
         {
-            DealEccMethod(mID,nID,nPos,mBasis);
+            DealEccMethod(mID,nID,nPos);
         }
         //nID已到达过目标位置，mID已到达过目标位置
         else if(m_bDealRuned[nID-1]&&m_bDealRuned[mID-1])
         {
             if(CalCenSlice(nID,nPos)==CenTargetSlice(nID))
             {
-                DealEccMethod(nID,mID,nPos,nBasis);
+                DealEccMethod(nID,mID,nPos);
             }
             else
             {
-                DealEccMethod(mID,nID,nPos,mBasis);
+                DealEccMethod(mID,nID,nPos);
             }
         }
         //nID未到达过目标位置，mID未到达过目标位置
@@ -856,11 +848,11 @@ void Pan::DealCollision(int nID, int mID, int nPos, bool* bCE)
         {
             if(EccTargetSlice(nID)-CalEccSlice(nID,nPos)<=EccTargetSlice(mID)-CalEccSlice(mID,nPos))
             {
-                DealEccMethod(nID,mID,nPos,nBasis);
+                DealEccMethod(nID,mID,nPos);
             }
             else
             {
-                DealEccMethod(mID,nID,nPos,mBasis);
+                DealEccMethod(mID,nID,nPos);
             }
         }
     }
@@ -868,33 +860,51 @@ void Pan::DealCollision(int nID, int mID, int nPos, bool* bCE)
 
 void Pan::DealCenMethod(int nID, int mID, int nPos)
 {
-    /// nID单元中心轴与mID单元偏心轴碰撞，以nID单元中心轴为依据，处理mID单元中心轴、偏心轴
-    //nID单元不运动或中心轴转动到目标位置
-    if(CenTargetSlice(nID)==CalCenSlice(nID,nPos))
+    /// nID单元中心轴与mID单元偏心轴碰撞，以mID单元在中心轴目标位置时其偏心轴从0到目标位置转动，
+    /// 偏心轴扫过的区域与nID单元中心轴目标位置是否碰撞标签，处理mID单元中心轴、偏心轴
+    int nBasis=m_mapResult[QString::number(mID,10)+QString::number(nID,10)];
+    switch(nBasis)
     {
-        //当前位置数已经大于mID中心轴目标位置，只能处理中心轴
-        if(CenTargetSlice(mID)<nPos)
+    //mID单元偏心轴扫过的区域与nID单元中心轴目标位置无碰撞
+    case BASIS_NULL:
+        DealEcc(mID,nPos);
+        break;
+    //mID单元偏心轴扫过的区域与nID单元中心轴目标位置碰撞
+    case BASIS_CEN:
+        if(CalCenSlice(mID,nPos)>0)
         {
             DealCen(mID,nPos);
         }
-        //当前mID中心轴还在转动，处理偏心轴
         else
         {
             DealEcc(mID,nPos);
         }
-    }
-    //nID单元未转动到目标位置
-    else
-    {
-        //偏心轴转动到0时，不会与中心轴相碰
+        break;
+    //mID单元偏心轴扫过的区域与nID单元偏心轴目标位置碰撞
+    case BASIS_ECC:
         DealEcc(mID,nPos);
+        break;
+    //mID单元偏心轴扫过的区域与nID单元目标位置都碰撞
+    case BASIS_CEC:
+        if(CalCenSlice(mID,nPos)>0)
+        {
+            DealCen(mID,nPos);
+        }
+        else
+        {
+            DealEcc(mID,nPos);
+        }
+        break;
+    default:
+        break;
     }
 }
 
-void Pan::DealEccMethod(int nID, int mID, int nPos, int nBasis)
+void Pan::DealEccMethod(int nID, int mID, int nPos)
 {
-    /// nID单元偏心轴与mID单元偏心轴相碰，以nID单元在中心轴目标位置时其偏心轴从0到目标位置转动
-    /// 与mID单元目标位置的碰撞情况为依据，处理nID、mID单元情况
+    /// nID单元偏心轴与mID单元偏心轴相碰，以nID单元在中心轴目标位置时其偏心轴从0到目标位置转动，
+    /// 偏心轴扫过的区域与mID单元目标位置的碰撞情况为依据，处理nID、mID单元情况
+    int nBasis=m_mapResult[QString::number(nID,10)+QString::number(mID,10)];
     switch(nBasis)
     {
     //nID单元偏心轴扫过的区域与mID单元目标位置无碰撞

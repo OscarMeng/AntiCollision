@@ -11,7 +11,7 @@ AntiCollisionArea::AntiCollisionArea(ControlWidget *pControl, ShapeWidget *pShap
     m_nBarWidth=20;
     int width=this->width()-m_nBarWidth;
     int height=this->height()-m_nBarWidth;
-    m_pPaintArea=new PaintArea(this,width,height);//scroll窗口在上面，widget画图窗口在下面
+    m_pPaintArea=new PaintArea(this,width,height);//Anti是scroll窗口在上面，paint是widget画图窗口在下面
     setWidget(m_pPaintArea);
 }
 
