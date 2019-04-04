@@ -137,21 +137,21 @@ void Cell::Draw()
         DrawUnexpanded();
     }
     //写单元数
-    m_pPainter->setPen(*(m_pPan->m_pSolidPen[COLOR_NUM]));
-    QFont font("Times New Roman",40,75);
-    m_pPainter->setFont(font);
-    if(m_nID==60)
-    {
-        m_pPainter->drawText(CalRect(m_dCenterX+5,m_dCenterY-5,STOP_RADIUS),Qt::AlignCenter,QString::number(1,10));
-    }
-    else if(m_nID==75)
-    {
-        m_pPainter->drawText(CalRect(m_dCenterX-5,m_dCenterY,STOP_RADIUS),Qt::AlignCenter,QString::number(2,10));
-    }
-    else if(m_nID==76)
-    {
-        m_pPainter->drawText(CalRect(m_dCenterX-5,m_dCenterY,STOP_RADIUS),Qt::AlignCenter,QString::number(3,10));
-    }
+//    m_pPainter->setPen(*(m_pPan->m_pSolidPen[COLOR_NUM]));
+//    QFont font("Times New Roman",40,75);
+//    m_pPainter->setFont(font);
+//    if(m_nID==60)
+//    {
+//        m_pPainter->drawText(CalRect(m_dCenterX+5,m_dCenterY-5,STOP_RADIUS),Qt::AlignCenter,QString::number(1,10));
+//    }
+//    else if(m_nID==75)
+//    {
+//        m_pPainter->drawText(CalRect(m_dCenterX-5,m_dCenterY,STOP_RADIUS),Qt::AlignCenter,QString::number(2,10));
+//    }
+//    else if(m_nID==76)
+//    {
+//        m_pPainter->drawText(CalRect(m_dCenterX-5,m_dCenterY,STOP_RADIUS),Qt::AlignCenter,QString::number(3,10));
+//    }
 //    m_pPainter->setPen(*(m_pPan->m_pSolidPen[COLOR_NUM]));
 //    QFont font;
 //    font.setPointSize(10);
