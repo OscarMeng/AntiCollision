@@ -1,6 +1,6 @@
 #include "axiswidget.h"
 
-AxisWidget::AxisWidget()
+AxisWidget::AxisWidget(bool bCenEcc)
 {
     QPalette bgpal = palette();
     bgpal.setColor(QPalette::Background, QColor (170, 230 , 200));
@@ -12,17 +12,14 @@ AxisWidget::AxisWidget()
     m_ptXStart=QPoint(0,0);
     m_ptXEnd=QPoint(0,0);
     m_sID=1;
-    m_bCenEcc=true;
+    m_bCenEcc=bCenEcc;
     m_sData="";
     m_sTitle="";
 }
 
 AxisWidget::~AxisWidget()
 {
-    if(m_pPainter)
-    {
-//        delete m_pPainter;
-    }
+
 }
 
 void AxisWidget::paintEvent(QPaintEvent *e)
@@ -162,10 +159,9 @@ void AxisWidget::DrawAmplitude()
     }
 }
 
-void AxisWidget::ReceiveValue(QString sID, bool bCenEcc, QString sData)
+void AxisWidget::ReceiveValue(QString sID, QString sData)
 {
     m_sID=sID;
-    m_bCenEcc=bCenEcc;
     m_sData=sData;
 }
 

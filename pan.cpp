@@ -119,7 +119,7 @@ void Pan::InitDrawTools()
     {
         col = GetDefinedColor(i);
         m_cColor[i] = col;
-        m_pSolidPen[i] = new QPen(col, 1.2, Qt::SolidLine,Qt::SquareCap,Qt::MiterJoin);
+        m_pSolidPen[i] = new QPen(col, 2.2, Qt::SolidLine,Qt::SquareCap,Qt::MiterJoin);
         m_pDashPen[i] = new QPen(col, 1, Qt::DashLine,Qt::SquareCap,Qt::MiterJoin);
         m_pDddPen[i] = new QPen(col, 1, Qt::DashDotDotLine,Qt::SquareCap,Qt::MiterJoin);
         m_bBrush[i] = new QBrush(col);
@@ -213,8 +213,7 @@ void Pan::CellCenEccValue(QPoint &point)
                 se+=QString::number(CellEccPosValue(nID,i));
             }
         }
-        emit SendCenValue(QString::number(nID,10),sc);
-        emit SendEccValue(QString::number(nID,10),se);
+        emit SendShapeValue(QString::number(nID,10),sc,se);
     }
 }
 
@@ -258,6 +257,16 @@ void Pan::Draw()
     m_pPainter->setPen(*m_pDddPen[COLOR_COORD]);
     m_pPainter->drawLine(Op2Vp(0,m_dRPan+20.0),Op2Vp(0,-m_dRPan-20.0));
     m_pPainter->drawLine(Op2Vp(m_dRPan+20.0,0),Op2Vp(-m_dRPan-20.0,0));
+    //画框
+    QPen* pen= new QPen(QColor(0, 0, 0), 4.5, Qt::SolidLine,Qt::SquareCap,Qt::MiterJoin);
+    m_pPainter->setPen(*pen);
+    double ds1=18;
+    double ds2=44.1;
+    double dl=73;
+    m_pPainter->drawLine(Op2Vp(ds1,-ds2),Op2Vp(ds1,-ds2-dl));
+    m_pPainter->drawLine(Op2Vp(ds1,-ds2-dl),Op2Vp(ds1+dl,-ds2-dl));
+    m_pPainter->drawLine(Op2Vp(ds1+dl,-ds2-dl),Op2Vp(ds1+dl,-ds2));
+    m_pPainter->drawLine(Op2Vp(ds1+dl,-ds2),Op2Vp(ds1,-ds2));
     //画碰撞区域
     m_pPainter->setPen(*m_pSolidPen[COLOR_BORDER]);
     for(int i=0;i<m_nPathIndex;i++)

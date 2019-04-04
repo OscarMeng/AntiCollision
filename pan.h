@@ -155,8 +155,8 @@ signals:
     void SendCollision(int nID,int mID,bool bn,bool bm);
     void ShowText(QString sTemp);
     void DealProgress();
-    void SendCenValue(QString sID,QString sData);
-    void SendEccValue(QString sID,QString sData);
+    void SendShapeValue(QString sID,QString sCenData,QString sEccData);
+
 public slots:
     void    CommonRun();
     void    PauseRun();

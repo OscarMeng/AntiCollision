@@ -5,7 +5,7 @@ MainWidget::MainWidget(QWidget *parent)
 {
 //如果设置了固定尺寸，各布局窗口大小的最小值要适合固定尺寸
 //    setFixedSize(1300,900);
-    setWindowTitle(tr("LAMOST碰撞处理"));
+    setWindowTitle(tr("LAMOST(25mm)碰撞处理"));
     m_bUnitStyle=true;
     m_pAntiArea=new AntiCollisionArea(m_pCtrlWidget,m_pShapeWidget);
     m_pCtrlWidget=new ControlWidget(m_pAntiArea->m_pPaintArea->m_pPan);
@@ -29,12 +29,12 @@ MainWidget::MainWidget(QWidget *parent)
     m_pShapeStack->addWidget(m_pNewShape);
 
     m_pCellType = new QMenu(tr("单元类型"));
-    m_pOldAct = new QAction(tr("25.6mm单元"),this);
+    m_pOldAct = new QAction(tr("25mm单元"),this);
     m_pOldAct->setShortcut(Qt::CTRL | Qt::Key_O );
-    m_pOldAct->setStatusTip(tr("单元间距25.6"));
+    m_pOldAct->setStatusTip(tr("单元间距25.6mm"));
     m_pNewAct=new QAction(tr("45mm单元"),this);
     m_pNewAct->setShortcut(tr("Ctrl+N"));
-    m_pNewAct->setStatusTip(tr("单元间距45"));
+    m_pNewAct->setStatusTip(tr("单元间距45mm"));
     m_pCellType->addAction(m_pOldAct);
     m_pCellType->addAction(m_pNewAct);
     connect(m_pOldAct,SIGNAL(triggered()),this,SLOT(SetOldUnit()));
@@ -69,7 +69,7 @@ MainWidget::~MainWidget()
 
 void MainWidget::SetOldUnit()
 {
-    setWindowTitle(tr("LAMOST碰撞处理"));
+    setWindowTitle(tr("LAMOST(25mm)碰撞处理"));
     m_bUnitStyle=true;
     m_pAntiStack->setCurrentIndex(0);
     m_pControlStack->setCurrentIndex(0);
@@ -78,7 +78,7 @@ void MainWidget::SetOldUnit()
 
 void MainWidget::SetNewUnit()
 {
-    setWindowTitle(tr("LAMOST新单元碰撞处理"));
+    setWindowTitle(tr("LAMOST(45mm)碰撞处理"));
     m_bUnitStyle=false;
     m_pAntiStack->setCurrentIndex(1);
     m_pControlStack->setCurrentIndex(1);

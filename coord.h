@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include "mymethod.h"
+#include <qmath.h>
 
 class Coord : public QObject
 {

@@ -12,7 +12,7 @@ NewShape::NewShape(NewPaint *pPaint, NewPan *pPan) : m_pNewPaint(pPaint),m_pNewP
     m_pCellIDEdit=new QLineEdit;
     m_pCenBtn=new QPushButton(tr("中心轴"));
     m_pEccBtn=new QPushButton(tr("偏心轴"));
-    m_pAxis=new AxisWidget();
+    m_pAxis=new AxisWidget(true);
     m_pTextEdit=new QTextEdit;
 
     m_pCellLayout=new QHBoxLayout();

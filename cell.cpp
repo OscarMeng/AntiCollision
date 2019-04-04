@@ -137,6 +137,21 @@ void Cell::Draw()
         DrawUnexpanded();
     }
     //写单元数
+    m_pPainter->setPen(*(m_pPan->m_pSolidPen[COLOR_NUM]));
+    QFont font("Times New Roman",40,75);
+    m_pPainter->setFont(font);
+    if(m_nID==60)
+    {
+        m_pPainter->drawText(CalRect(m_dCenterX+5,m_dCenterY-5,STOP_RADIUS),Qt::AlignCenter,QString::number(1,10));
+    }
+    else if(m_nID==75)
+    {
+        m_pPainter->drawText(CalRect(m_dCenterX-5,m_dCenterY,STOP_RADIUS),Qt::AlignCenter,QString::number(2,10));
+    }
+    else if(m_nID==76)
+    {
+        m_pPainter->drawText(CalRect(m_dCenterX-5,m_dCenterY,STOP_RADIUS),Qt::AlignCenter,QString::number(3,10));
+    }
 //    m_pPainter->setPen(*(m_pPan->m_pSolidPen[COLOR_NUM]));
 //    QFont font;
 //    font.setPointSize(10);
@@ -205,6 +220,31 @@ void Cell::DrawTargetPos()
     QPointF p4=QPointF(p.x()+d,p.y()+d);
     m_pPainter->drawLine(m_pPan->Op2Vp(p1),m_pPan->Op2Vp(p4));
     m_pPainter->drawLine(m_pPan->Op2Vp(p2),m_pPan->Op2Vp(p3));
+
+//    m_pPainter->setPen(*(m_pPan->m_pSolidPen[COLOR_NUM]));
+//    QFont font("Times New Roman",40,75);
+//    m_pPainter->setFont(font);
+//    if(m_nID==60)
+//    {
+//        m_pPainter->drawText(CalRect(m_dCenterX+m_dRadius*cos(dRadian),m_dCenterY-m_dRadius*sin(dRadian)-3.3,STOP_RADIUS),
+//                             Qt::AlignCenter,QString::number(1,10));
+//        m_pPainter->drawText(CalRect(m_dCenterX+m_dRadius*cos(dRadian)+2,m_dCenterY-m_dRadius*sin(dRadian)-3.3,STOP_RADIUS),
+//                             Qt::AlignCenter,"*");
+//    }
+//    else if(m_nID==75)
+//    {
+//        m_pPainter->drawText(CalRect(m_dCenterX+m_dRadius*cos(dRadian),m_dCenterY-m_dRadius*sin(dRadian)+3,STOP_RADIUS),
+//                             Qt::AlignCenter,QString::number(2,10));
+//        m_pPainter->drawText(CalRect(m_dCenterX+m_dRadius*cos(dRadian)+2,m_dCenterY-m_dRadius*sin(dRadian)+3,STOP_RADIUS),
+//                             Qt::AlignCenter,"*");
+//    }
+//    else if(m_nID==76)
+//    {
+//        m_pPainter->drawText(CalRect(m_dCenterX+m_dRadius*cos(dRadian),m_dCenterY-m_dRadius*sin(dRadian)+3,STOP_RADIUS),
+//                             Qt::AlignCenter,QString::number(3,10));
+//        m_pPainter->drawText(CalRect(m_dCenterX+m_dRadius*cos(dRadian)+2,m_dCenterY-m_dRadius*sin(dRadian)+3,STOP_RADIUS),
+//                             Qt::AlignCenter,"*");
+//    }
 }
 
 double Cell::LengthByPoint(const QPointF pointF)

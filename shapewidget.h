@@ -28,23 +28,20 @@ public:
     Pan         *m_pPan;
     QLabel      *m_pCellLabel;
     QLineEdit   *m_pCellIDEdit;
-    QPushButton *m_pCenBtn;
-    QPushButton *m_pEccBtn;
-    AxisWidget  *m_pAxis;
-    QTextEdit   *m_pTextEdit;
+    QPushButton *m_pBtn;
+    AxisWidget  *m_pAxis1;
+    AxisWidget  *m_pAxis2;
     QHBoxLayout *m_pCellLayout;
     QGridLayout *m_pMainLayout;
 public:
-    bool      m_bCenBtn;//默认中心轴数据
-public:
+    bool    m_bCen;//中心轴
+    bool    m_bEcc;//偏心轴
 
 signals:
-    void    SendValue(QString sID,bool bCenEcc,QString sData);//单元号，中心轴还是偏心轴，数据发送给坐标轴
+
 public slots:
-    void    ReceiveCenShape(QString sID,QString sData);
-    void    ReceiveEccShape(QString sID,QString sData);
-    void    PressCenBtn();
-    void    PressEccBtn();
+    void    ReceiveShapeValue(QString sID,QString sCenData,QString sEccData);
+    void    PressBtn();
 };
 
 #endif // SHAPEWIDGET_H

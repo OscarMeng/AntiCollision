@@ -6,12 +6,13 @@
 #include <QLabel>
 #include <QStringList>
 #include "mymethod.h"
+#include <QtMath>
 
 class AxisWidget: public QWidget
 {
     Q_OBJECT
 public:
-    AxisWidget();
+    AxisWidget(bool bCenEcc);
 public:
     virtual ~AxisWidget();
 public:
@@ -35,8 +36,9 @@ public:
     void    DrawArrow();
     void    DrawAxisText();
     void    DrawAmplitude();
+    void    ReceiveValue(QString sID, QString sData);
 public slots:
-    void    ReceiveValue(QString sID,bool bCenEcc,QString sData);
+
 };
 
 #endif // AXISWIDGET_H
